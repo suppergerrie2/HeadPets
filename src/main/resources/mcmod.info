@@ -1,0 +1,16 @@
+[
+{
+  "modid": "spets",
+  "name": "HeadPets Mod",
+  "description": "This mod adds head pets.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["suppergerrie2"],
+  "credits": "The internet.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
