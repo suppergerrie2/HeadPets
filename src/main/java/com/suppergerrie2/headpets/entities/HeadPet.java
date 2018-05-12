@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.suppergerrie2.headpets.HeadPets;
 import com.suppergerrie2.headpets.entities.ai.EntityAIFollowOwner;
 
@@ -24,25 +25,22 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.server.management.PreYggdrasilConverter;
-import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.world.World;
 
-public class Pet extends EntityCreature implements IEntityOwnable {
+public class HeadPet extends EntityCreature implements IEntityOwnable {
 
-	protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(Pet.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	protected static final DataParameter<String> RENDER_PLAYER_NAME = EntityDataManager.<String>createKey(Pet.class, DataSerializers.STRING);
+	protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(HeadPet.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	protected static final DataParameter<String> TEXTURE = EntityDataManager.<String>createKey(HeadPet.class, DataSerializers.STRING);
 	
 	GameProfile gameprofile;
 	
-	String texture = null;
-
-	public Pet(World worldIn) {
+	public HeadPet(World worldIn) {
 		this(worldIn, UUID.fromString("a586b43a-8172-4162-96d9-1f058395cf7b"));
 	}
 
-	public Pet(World worldIn, UUID owner) {
+	public HeadPet(World worldIn, UUID owner) {
 		super(worldIn);
-		this.setSize(0.4f, 0.4f);
+		this.setSize(0.5f, 0.5f);
 		this.setOwnerId(owner);
 	}
 
@@ -50,7 +48,7 @@ public class Pet extends EntityCreature implements IEntityOwnable {
 	{
 		super.entityInit();
 		this.dataManager.register(OWNER_UNIQUE_ID, Optional.absent());
-		this.dataManager.register(RENDER_PLAYER_NAME, "");
+		this.dataManager.register(TEXTURE, "");
 	}
 
 	protected void initEntityAI() {
@@ -86,9 +84,7 @@ public class Pet extends EntityCreature implements IEntityOwnable {
 			compound.setString("OwnerUUID", this.getOwnerId().toString());
 		}
 		
-		if(texture!=null) {
-			compound.setString("Texture", texture);
-		}
+		compound.setString("Texture", dataManager.get(TEXTURE));
 		
 		if(this.gameprofile!=null) {
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
@@ -96,12 +92,8 @@ public class Pet extends EntityCreature implements IEntityOwnable {
             compound.setTag("GameProfile", nbttagcompound);
 		}
 		
-		compound.setString("RenderName", this.getRenderPlayerName());
 	}
 
-	/**
-	 * (abstract) Protected helper method to read subclass entity data from NBT.
-	 */
 	public void readEntityFromNBT(NBTTagCompound compound)
 	{
 		super.readEntityFromNBT(compound);
@@ -133,10 +125,10 @@ public class Pet extends EntityCreature implements IEntityOwnable {
          {
              this.gameprofile = NBTUtil.readGameProfileFromNBT(compound.getCompoundTag("GameProfile"));
          }
-		
-		if(compound.hasKey("RenderName")) {
-			this.setRenderPlayerName(compound.getString("RenderName"));
-		}
+		 
+		 if(compound.hasKey("Texture")) {
+			 this.dataManager.set(TEXTURE, compound.getString("Texture"));
+		 }
 	}
 
 	@Override
@@ -150,26 +142,6 @@ public class Pet extends EntityCreature implements IEntityOwnable {
 		this.dataManager.set(OWNER_UNIQUE_ID, Optional.fromNullable(p_184754_1_));
 	}
 
-	public String getRenderPlayerName()
-	{
-		return this.dataManager.get(RENDER_PLAYER_NAME);
-	}
-
-	public void setRenderPlayerName(String name)
-	{
-		this.dataManager.set(RENDER_PLAYER_NAME, name);
-		
-		if(gameprofile==null||!gameprofile.getName().equals(name)) {
-			if(!this.world.isRemote) {
-				gameprofile = new GameProfile(null, name);
-			} else {
-				gameprofile = null;
-			}
-			System.out.println(name + "|" + gameprofile.toString());
-			gameprofile = TileEntitySkull.updateGameprofile(gameprofile);
-		}
-	}
-
 	@Override
 	public EntityLivingBase getOwner() {
 		try {
@@ -179,11 +151,22 @@ public class Pet extends EntityCreature implements IEntityOwnable {
 			return null;
 		}
 	}
+	
+	public void setTexture(String texture) {
+		this.dataManager.set(TEXTURE, texture);
+		this.gameprofile = new GameProfile(this.getUniqueID(), this.getName());
+		this.gameprofile.getProperties().put("textures", new Property("textures", texture));
+	}
 
 	public GameProfile getOwnerProfile() {
-		if(this.gameprofile==null&&this.getRenderPlayerName().length()>0) {
-			gameprofile = TileEntitySkull.updateGameprofile(new GameProfile(null, this.getRenderPlayerName()));
+		if(this.gameprofile==null) {
+			String text = dataManager.get(TEXTURE);
+			if(text.length()>0) {
+				this.gameprofile = new GameProfile(this.getUniqueID(), this.getName());
+				this.gameprofile.getProperties().put("textures", new Property("textures", this.dataManager.get(TEXTURE)));
+			}
 		}
+		
 		return this.gameprofile;
 	}
 

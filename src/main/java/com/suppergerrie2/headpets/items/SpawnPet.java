@@ -1,10 +1,15 @@
 package com.suppergerrie2.headpets.items;
 
-import com.suppergerrie2.headpets.entities.Pet;
+import com.google.common.collect.Iterables;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.properties.Property;
+import com.suppergerrie2.headpets.entities.HeadPet;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -24,8 +29,22 @@ public class SpawnPet extends Item {
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
 
 		if(!worldIn.isRemote) {
-			Pet pet = new Pet(worldIn, player.getGameProfile().getId());
-			pet.setRenderPlayerName(player.getName());
+			HeadPet pet = new HeadPet(worldIn, player.getGameProfile().getId());
+			
+			GameProfile profile = player.getGameProfile();
+			PlayerProfileCache profileCache = worldIn.getMinecraftServer().getPlayerProfileCache();
+			profile = profileCache.getGameProfileForUsername("Dinnerbone");
+			
+			MinecraftSessionService sessionService = worldIn.getMinecraftServer().getMinecraftSessionService();
+			profile = sessionService.fillProfileProperties(profile, false);
+			
+			String text = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdlMjI4YjllOTVjOTg2NzIxMTU1NWFjYjE1N2IwYmFhODJiZjhhY2E0MThmY2UwNjFlN2YyZjQyMWNlOGJkZSJ9fX0=";
+			if(profile.getProperties().containsKey("textures")) {
+				 Property property = (Property)Iterables.getFirst(profile.getProperties().get("textures"), (Object)null);
+				 text = property.getValue();
+			}
+			
+			pet.setTexture(text);//			pet.setRenderPlayerName(player.getName());
 			
 			double x = pos.getX()+hitX;
 			x+=facing.getFrontOffsetX()*pet.getEntityBoundingBox().maxX;

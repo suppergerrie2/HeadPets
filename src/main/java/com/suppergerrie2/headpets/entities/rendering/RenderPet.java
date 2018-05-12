@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-import com.suppergerrie2.headpets.entities.Pet;
+import com.suppergerrie2.headpets.entities.HeadPet;
 import com.suppergerrie2.headpets.entities.rendering.models.PetModel;
 
 import net.minecraft.client.Minecraft;
@@ -15,14 +15,14 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPet extends RenderLiving<Pet> {
+public class RenderPet extends RenderLiving<HeadPet> {
 
 	public RenderPet(RenderManager rendermanagerIn) {
 		super(rendermanagerIn, new PetModel(), 0.3f);
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Pet entity) {
+	protected ResourceLocation getEntityTexture(HeadPet entity) {
         ResourceLocation resourcelocation = DefaultPlayerSkin.getDefaultSkinLegacy();
 
         if (entity.getOwnerProfile() != null)

@@ -2,7 +2,7 @@ package com.suppergerrie2.headpets;
 
 import org.apache.logging.log4j.Logger;
 
-import com.suppergerrie2.headpets.entities.Pet;
+import com.suppergerrie2.headpets.entities.HeadPet;
 import com.suppergerrie2.headpets.proxies.IProxy;
 
 import net.minecraft.entity.Entity;
@@ -33,7 +33,7 @@ public class HeadPets {
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
 		
-		this.registerEntity(Pet.class, "pet");
+		this.registerEntity(HeadPet.class, "pet");
 		
 		proxy.preInit(event);
 		logger.info("preInit");

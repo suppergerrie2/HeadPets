@@ -20,7 +20,7 @@ public class PetModel extends ModelBase {
 		
 		ModelBase modelbase = this.humanoidHead;
 		GlStateManager.translate(0, 1.5F, 0);
-        modelbase.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+        modelbase.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, 0, scale);
 		
 		GlStateManager.popMatrix();
 
