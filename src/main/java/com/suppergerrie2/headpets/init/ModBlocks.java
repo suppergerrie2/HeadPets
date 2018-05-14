@@ -2,6 +2,7 @@ package com.suppergerrie2.headpets.init;
 
 import com.suppergerrie2.headpets.Reference;
 import com.suppergerrie2.headpets.blocks.HeadCrafter;
+import com.suppergerrie2.headpets.tileentity.TileEntityHeadCrafter;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -13,6 +14,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod.EventBusSubscriber(modid=Reference.MODID)
 public class ModBlocks {
@@ -23,6 +25,7 @@ public class ModBlocks {
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
 		headCrafter=new HeadCrafter(Material.ROCK);
 		event.getRegistry().registerAll(headCrafter);
+		GameRegistry.registerTileEntity(TileEntityHeadCrafter.class, "tile_head_crafter");
 	}
 	
 	@SubscribeEvent
