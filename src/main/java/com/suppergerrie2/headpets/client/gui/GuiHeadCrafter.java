@@ -23,7 +23,7 @@ public class GuiHeadCrafter extends GuiContainer {
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MODID + ":textures/gui/head_crafter.png");
 	private final InventoryPlayer player;
 	private final TileEntityHeadCrafter tileentity;
-    private GuiButton doneBtn;
+//    private GuiButton doneBtn;
     private GuiTextField headTextField;
 
 	public GuiHeadCrafter(InventoryPlayer player, TileEntityHeadCrafter tileentity) {
@@ -36,9 +36,10 @@ public class GuiHeadCrafter extends GuiContainer {
 	public void initGui()
     {
 		super.initGui();
-		doneBtn = this.addButton(new GuiButtonArrow(0, this.width/2-9, 71));
+//		doneBtn = this.addButton(new GuiButtonArrow(0, this.width/2-9, 71));
 		this.headTextField = new GuiTextField(2, this.fontRenderer, (this.width - 75) / 2, 41, 75, 15);
         this.headTextField.setMaxStringLength(32500);
+        this.headTextField.setText(tileentity.getTextureString());
         this.headTextField.setFocused(false);
         Keyboard.enableRepeatEvents(true);
     }
@@ -67,6 +68,7 @@ public class GuiHeadCrafter extends GuiContainer {
 			super.keyTyped(typedChar, keyCode);
 		}
 		this.headTextField.textboxKeyTyped(typedChar, keyCode);
+		HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingStartMessage(headTextField.getText(), tileentity.getPos()));
     }
 	
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
@@ -78,18 +80,21 @@ public class GuiHeadCrafter extends GuiContainer {
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		
 		this.mc.getTextureManager().bindTexture(TEXTURE);
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+		float percentDone = (float)tileentity.getCurrentCraftTime()/tileentity.getTotalCraftTime();
+		this.drawTexturedModalRect(this.guiLeft+79, this.guiTop+34, 176, 0, (int) (24*percentDone), 17);
         this.headTextField.drawTextBox();
 	}
 
-	protected void actionPerformed(GuiButton button)
-    {
-		if(button == doneBtn) {
-			if(headTextField.getText().length()>0) {
-				System.out.println("Start crafting");
-				HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingStartMessage(headTextField.getText(), tileentity.getPos()));
-			}
-		}
-    }
+//	protected void actionPerformed(GuiButton button)
+//    {
+//		if(button == doneBtn) {
+//			if(headTextField.getText().length()>0) {
+//				System.out.println("Start crafting");
+//				HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingStartMessage(headTextField.getText(), tileentity.getPos()));
+//			}
+//		}
+//    }
 }

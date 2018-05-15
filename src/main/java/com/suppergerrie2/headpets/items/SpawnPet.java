@@ -9,6 +9,9 @@ import com.suppergerrie2.headpets.entities.HeadPet;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -31,12 +34,24 @@ public class SpawnPet extends Item {
 		if(!worldIn.isRemote) {
 			HeadPet pet = new HeadPet(worldIn, player.getGameProfile().getId());
 			
-			GameProfile profile = player.getGameProfile();
-			PlayerProfileCache profileCache = worldIn.getMinecraftServer().getPlayerProfileCache();
-			profile = profileCache.getGameProfileForUsername("Dinnerbone");
+			ItemStack itemstack = player.getHeldItem(hand);
+			GameProfile profile = null;
 			
-			MinecraftSessionService sessionService = worldIn.getMinecraftServer().getMinecraftSessionService();
-			profile = sessionService.fillProfileProperties(profile, false);
+			if(itemstack.hasTagCompound()) {
+				NBTTagCompound nbttagcompound = itemstack.getTagCompound();
+
+                if (nbttagcompound.hasKey("GameProfile", 10)) {
+                	profile = NBTUtil.readGameProfileFromNBT(nbttagcompound.getCompoundTag("GameProfile"));
+                }
+			} 
+			if(profile==null){
+				profile = player.getGameProfile();
+			}
+//			PlayerProfileCache profileCache = worldIn.getMinecraftServer().getPlayerProfileCache();
+//			profile = profileCache.getGameProfileForUsername("Dinnerbone");
+			
+//			MinecraftSessionService sessionService = worldIn.getMinecraftServer().getMinecraftSessionService();
+//			profile = sessionService.fillProfileProperties(profile, false);
 			
 			String text = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdlMjI4YjllOTVjOTg2NzIxMTU1NWFjYjE1N2IwYmFhODJiZjhhY2E0MThmY2UwNjFlN2YyZjQyMWNlOGJkZSJ9fX0=";
 			if(profile.getProperties().containsKey("textures")) {
