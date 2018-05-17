@@ -72,6 +72,11 @@ public class SpawnPet extends Item {
 			
 			pet.setPosition(x,y, z);
 			worldIn.spawnEntity(pet);
+			
+			if (!player.capabilities.isCreativeMode)
+			{
+				itemstack.shrink(1);
+			}
 		}
 
 		return EnumActionResult.SUCCESS;

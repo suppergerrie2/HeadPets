@@ -1,0 +1,33 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SWS",
+    "www",
+    "mmm"  ],
+  "key": {
+    "S": [
+      {
+        "item": "minecraft:nether_star"
+      }
+    ],
+    "W": [
+      {
+        "item": "minecraft:skull",
+        "data": 1
+      }
+    ],
+    "w": [
+      {
+        "item": "minecraft:nether_wart_block"
+      }
+    ],
+    "m": [
+      {
+        "item": "minecraft:mossy_cobblestone"
+      }
+    ]
+  },
+  "result": {
+    "item": "spets:head_crafter"
+  }
+}

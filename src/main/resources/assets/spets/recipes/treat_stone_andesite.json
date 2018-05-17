@@ -1,0 +1,21 @@
+{ 
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+	  "item": "minecraft:stone",
+	  "data": 5
+	},
+	{
+	  "item": "minecraft:bone_block",
+	  "data": 0
+	},
+    {
+	  "item": "minecraft:dragon_egg",
+	  "data": 0
+	}
+  ],
+  "result": {
+    "item": "spets:treat_stone_andesite"
+  }
+}
+

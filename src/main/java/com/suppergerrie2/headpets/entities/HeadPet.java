@@ -8,7 +8,9 @@ import com.google.common.base.Optional;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.suppergerrie2.headpets.HeadPets;
+import com.suppergerrie2.headpets.items.ItemTreat;
 
+import net.minecraft.block.BlockPlanks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
@@ -28,6 +30,8 @@ import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -50,6 +54,11 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 
 	boolean sitting = false;
 
+	ItemStack activeTreat = ItemStack.EMPTY;
+	int treatLevel = 0;
+
+	int timeTillTreat;
+
 	public HeadPet(World worldIn) {
 		this(worldIn, UUID.fromString("a586b43a-8172-4162-96d9-1f058395cf7b"));
 	}
@@ -58,6 +67,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 		super(worldIn);
 		this.setSize(0.5f, 0.5f);
 		this.setOwnerId(owner);
+		this.timeTillTreat = this.rand.nextInt(6000) + 6000;
 	}
 
 	protected void entityInit()
@@ -116,6 +126,14 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 
 		compound.setBoolean("Sitting", sitting);
 
+		if(!this.activeTreat.isEmpty()) {
+			NBTTagCompound tag = new NBTTagCompound();
+			this.activeTreat.writeToNBT(tag);
+			compound.setTag("ActiveTreat", tag);
+			compound.setInteger("TreatLevel", this.treatLevel);
+			compound.setInteger("TreatTime", this.timeTillTreat);
+		}
+
 	}
 
 	public void readEntityFromNBT(NBTTagCompound compound)
@@ -156,20 +174,33 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 
 		if(compound.hasKey("Sitting")) {
 			sitting = compound.getBoolean("Sitting");
+			this.aiSit.setSitting(sitting);
+		}
+
+		if(compound.hasKey("ActiveTreat")) {
+			this.activeTreat = new ItemStack((NBTTagCompound) compound.getTag("ActiveTreat"));
+			this.treatLevel = compound.getInteger("TreatLevel");
+			this.timeTillTreat = compound.getInteger("TreatTime");
 		}
 	}
 
 	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
-		
+
 		if(this.hurtResistantTime==0&&this.getHealth()<this.getMaxHealth()&&this.ticksExisted%20==0) {
 			this.heal(0.25f);
+		}
+		if(!this.world.isRemote&&this.timeTillTreat%20==0) System.out.println(this.timeTillTreat);
+		if(!this.world.isRemote&&!this.activeTreat.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
+			timeTillTreat = this.rand.nextInt(6000) + 6000;
+			timeTillTreat/=this.treatLevel;
+			this.entityDropItem(this.activeTreat, 0.0f);
 		}
 	}
 
 	public boolean processInteract(EntityPlayer player, EnumHand hand) {
-		if (this.isOwner(player) && !this.world.isRemote && hand == EnumHand.MAIN_HAND)
+		if (this.isOwner(player) && !this.world.isRemote && hand == EnumHand.MAIN_HAND && player.getHeldItem(hand).isEmpty())
 		{
 			sitting = !sitting;
 			this.aiSit.setSitting(sitting);
@@ -180,19 +211,42 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 
 		if(!world.isRemote) {
 			ItemStack itemstack = player.getHeldItem(hand);
-			if (itemstack!=null&&itemstack.getItem() instanceof ItemFood)
-			{
-				ItemFood itemfood = (ItemFood)itemstack.getItem();
-
-				if (itemfood.isWolfsFavoriteMeat() && this.getHealth()<this.getMaxHealth())
+			if(itemstack!=null) {
+				if (itemstack.getItem() instanceof ItemFood)
 				{
-					if (!player.capabilities.isCreativeMode)
-					{
-						itemstack.shrink(1);
-					}
+					ItemFood itemfood = (ItemFood)itemstack.getItem();
 
-					this.heal((float)itemfood.getHealAmount(itemstack));
-					return true;
+					if (itemfood.isWolfsFavoriteMeat() && this.getHealth()<this.getMaxHealth())
+					{
+						if (!player.capabilities.isCreativeMode)
+						{
+							itemstack.shrink(1);
+						}
+
+						this.heal((float)itemfood.getHealAmount(itemstack));
+						return true;
+					}
+				} else if(itemstack.getItem() instanceof ItemTreat) {
+					ItemTreat item = (ItemTreat) itemstack.getItem();
+
+					if(this.activeTreat.isItemEqual(item.treatDrop)) {
+						if(this.treatLevel<2 ) {
+							this.treatLevel++;
+							this.timeTillTreat/=this.treatLevel;
+							if (!player.capabilities.isCreativeMode)
+							{
+								itemstack.shrink(1);
+							}
+						}
+					} else {
+						this.activeTreat=item.treatDrop.copy();
+						this.treatLevel=1;
+						
+						if (!player.capabilities.isCreativeMode)
+						{
+							itemstack.shrink(1);
+						}
+					}
 				}
 			}
 		}
