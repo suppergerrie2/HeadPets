@@ -1,6 +1,7 @@
 package com.suppergerrie2.headpets.init;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.suppergerrie2.headpets.Reference;
@@ -19,6 +20,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
@@ -39,6 +41,32 @@ public class ModItems {
 		public boolean hasSearchBar() {
 			return true;
 		}
+
+		@Override
+		public void displayAllRelevantItems(NonNullList<ItemStack> p_78018_1_) {
+			super.displayAllRelevantItems(p_78018_1_);
+			p_78018_1_.sort(new Comparator<ItemStack>() {
+
+				@Override
+				public int compare(ItemStack o1, ItemStack o2) {
+					
+					if(o1.getItem() instanceof ItemTreat && o2.getItem() instanceof ItemTreat) {
+						return o1.getDisplayName().compareTo(o2.getDisplayName());
+					}
+					
+					if(o1.getItem() instanceof ItemTreat) {
+						return 1;
+					} else if (o2.getItem() instanceof ItemTreat) {
+						return -1;
+					}
+					
+					return o1.getDisplayName().compareTo(o2.getDisplayName());
+				}
+				
+			});
+		}
+		
+		
 
 	}.setBackgroundImageName("item_search.png");
 

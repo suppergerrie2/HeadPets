@@ -238,7 +238,6 @@ public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAd
 	}
 
 	public boolean processInteract(EntityPlayer player, EnumHand hand) {
-		System.out.println(EnumType.valueOf("SKELETON"));
 		if (this.isOwner(player) && !this.world.isRemote && hand == EnumHand.MAIN_HAND && player.getHeldItem(hand).isEmpty())
 		{
 			sitting = !sitting;

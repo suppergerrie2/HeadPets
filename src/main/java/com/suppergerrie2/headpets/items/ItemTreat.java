@@ -14,9 +14,8 @@ public class ItemTreat extends Item {
 	public ItemTreat(ItemStack treatDrop) {
 		this.setRegistryName("treat_"+treatDrop.getUnlocalizedName().replace(".", "_").replace("tile_", "").replace("item_", ""));
 		this.setUnlocalizedName("treat_"+treatDrop.getUnlocalizedName().replace(".", "_").replaceAll("tile_", "").replace("item_", ""));
-		String name = treatDrop.getItem().getRegistryName().toString();
-		name+=","+treatDrop.getMetadata();
-		System.out.println(name);
+//		String name = treatDrop.getItem().getRegistryName().toString();
+//		name+=","+treatDrop.getMetadata();
 		this.setCreativeTab(ModItems.tabHeadPets);
 		this.treatDrop = treatDrop;
 	}
