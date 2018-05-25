@@ -1,0 +1,29 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SBS",
+    "BDB",
+    "SBS"  ],
+  "key": {
+    "S": [
+      {
+        "item": "minecraft:nether_star"
+      }
+    ],
+    "B": [
+      {
+        "item": "minecraft:dragon_breath"
+      }
+    ],
+    "D": [
+      {
+        "item": "minecraft:dragon_egg",
+        "data": 0
+      }
+    ]
+  },
+  "result": {
+    "item": "minecraft:dragon_egg",
+    "count": 2
+  }
+}

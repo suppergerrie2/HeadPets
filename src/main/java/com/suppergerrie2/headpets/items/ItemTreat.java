@@ -1,10 +1,12 @@
 package com.suppergerrie2.headpets.items;
 
-import net.minecraft.creativetab.CreativeTabs;
+import com.suppergerrie2.headpets.init.ModItems;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.translation.I18n;
 
+@SuppressWarnings("deprecation")
 public class ItemTreat extends Item {
 
 	public final ItemStack treatDrop;
@@ -15,12 +17,12 @@ public class ItemTreat extends Item {
 		String name = treatDrop.getItem().getRegistryName().toString();
 		name+=","+treatDrop.getMetadata();
 		System.out.println(name);
-		this.setCreativeTab(CreativeTabs.MISC);
+		this.setCreativeTab(ModItems.tabHeadPets);
 		this.treatDrop = treatDrop;
 	}
-
+	
 	public String getItemStackDisplayName(ItemStack stack) {
-		return treatDrop.getDisplayName() + " " + I18n.format("item.treat");
+		return treatDrop.getDisplayName() + " " +  I18n.translateToLocal("item.treat");
 	}
 	
 }

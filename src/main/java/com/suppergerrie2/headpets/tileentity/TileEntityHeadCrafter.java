@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import com.suppergerrie2.headpets.inventory.ItemHandlerHeadCrafter;
 
@@ -15,6 +16,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -30,7 +32,10 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 	int currentCraftTime;
 	int totalCraftTime = 20*5;
 
-	UUID randUUID = UUID.randomUUID();
+//	UUID randUUID = UUID.randomUUID();
+	
+	boolean mode = true;
+	boolean started = false;
 
 	public TileEntityHeadCrafter() {
 		super();
@@ -40,33 +45,39 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 	@Override
 	public void update() {
 		boolean isChanged = false;
-
-		if(this.shouldCraft()) {
-			currentCraftTime++;
-			isChanged = true;
-			
-		} else if(currentCraftTime>0){
-			currentCraftTime = 0;
-			isChanged = true;
-		}
-
-		if(currentCraftTime>=totalCraftTime) {
-			try {
-				if(this.craftSkull()) {
-					currentCraftTime = 0;
-					isChanged = true;
-				}
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+//		this.mode = true;
+		if(!this.world.isRemote) {
+			if(this.shouldCraft(false)) {
+				currentCraftTime++;
+				isChanged = true;
+				
+			} else if(currentCraftTime>0){
+				currentCraftTime = 0;
+				isChanged = true;
+			} else {
+				this.started = false;
 			}
-		}
-		
-		if(isChanged) {
-			this.updateTile();
+	
+			if(currentCraftTime>=totalCraftTime) {
+				try {
+					if(this.craftSkull()) {
+						currentCraftTime = 0;
+						isChanged = true;
+					}
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			if(isChanged) {
+				this.updateTile();
+			}
 		}
 	}
 
-	private boolean shouldCraft() {
+	public boolean shouldCraft(boolean ignoreStarted) {
+		if(!started&&!ignoreStarted) return false;
+		
 		ItemStack[] recipe = new ItemStack[] {new ItemStack(Items.ROTTEN_FLESH), new ItemStack(Items.GHAST_TEAR), new ItemStack(Items.DYE, 1, 15), new ItemStack(Items.MILK_BUCKET)};
 
 		for(int slot = 0; slot < recipe.length; slot++) {
@@ -80,8 +91,20 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 
 	private boolean craftSkull() throws UnsupportedEncodingException {
 		
-		GameProfile gameprofile = new GameProfile(UUID.nameUUIDFromBytes(textureString.getBytes("UTF-8")), null);
-		gameprofile.getProperties().put("textures", new Property("textures", this.textureString));
+		GameProfile gameprofile;
+		
+		System.out.println(world.isRemote);
+		System.out.println(mode);
+		if(!mode) {
+			gameprofile = new GameProfile(UUID.nameUUIDFromBytes(textureString.getBytes("UTF-8")), null);
+			gameprofile.getProperties().put("textures", new Property("textures", this.textureString));
+		} else {
+			PlayerProfileCache profileCache = this.world.getMinecraftServer().getPlayerProfileCache();
+			gameprofile = profileCache.getGameProfileForUsername(this.textureString);
+			
+			MinecraftSessionService sessionService = this.world.getMinecraftServer().getMinecraftSessionService();
+			gameprofile = sessionService.fillProfileProperties(gameprofile, false);
+		}
 		ItemStack skull = new ItemStack(Items.SKULL, 1, 3);
 
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -115,6 +138,10 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 		if(nbtTagCompound.hasKey("CraftTime")) {
 			this.currentCraftTime = nbtTagCompound.getInteger("CraftTime");
 		}
+		
+		if(nbtTagCompound.hasKey("Mode")) {
+			this.mode = nbtTagCompound.getBoolean("Mode");
+		}
 
 		if(nbtTagCompound.hasKey("TotalCraftTime")) {
 			//        	this.totalCraftTime = nbtTagCompound.getInteger("TotalCraftTime");
@@ -128,6 +155,7 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 		nbtTagCompound.setTag("ItemHandler", itemHandler.serializeNBT());
 		nbtTagCompound.setString("TextureString", this.textureString);
 		nbtTagCompound.setInteger("CraftTime", this.currentCraftTime);
+		nbtTagCompound.setBoolean("Mode", this.mode);
 		//        nbtTagCompound.setInteger("TotalCraftTime", this.totalCraftTime);
 
 		return nbtTagCompound;
@@ -174,10 +202,11 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 		return this.writeToNBT(new NBTTagCompound());
 	}
 
-	public void startCrafting(String text) {
+	public void saveCraftingInfo(String text, boolean modeRecieved) {
 		if(text.equals(textureString)) return;
-		randUUID = UUID.randomUUID();
+//		randUUID = UUID.randomUUID();
 		textureString = text;
+		this.mode = modeRecieved;
 		this.updateTile();
 	}
 	
@@ -197,5 +226,9 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 
 	public int getTotalCraftTime() {
 		return this.totalCraftTime;
+	}
+
+	public void startCrafting() {
+		this.started = true;
 	}
 }

@@ -10,7 +10,7 @@ import com.mojang.authlib.properties.Property;
 import com.suppergerrie2.headpets.HeadPets;
 import com.suppergerrie2.headpets.items.ItemTreat;
 
-import net.minecraft.block.BlockPlanks;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,6 +21,7 @@ import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILeapAtTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
 import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
 import net.minecraft.entity.ai.EntityAISit;
@@ -30,7 +31,6 @@ import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -42,12 +42,17 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class HeadPet extends EntityTameable implements IEntityOwnable {
+public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAdditionalSpawnData  {
 
 	protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(HeadPet.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	protected static final DataParameter<String> TEXTURE = EntityDataManager.<String>createKey(HeadPet.class, DataSerializers.STRING);
+	protected static final DataParameter<String> GNAME = EntityDataManager.<String>createKey(HeadPet.class, DataSerializers.STRING);
 
 	EntityAISit aiSit;
 	GameProfile gameprofile;
@@ -59,15 +64,19 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 
 	int timeTillTreat;
 
+	private EnumType type;
+
 	public HeadPet(World worldIn) {
-		this(worldIn, UUID.fromString("a586b43a-8172-4162-96d9-1f058395cf7b"));
+		this(worldIn, UUID.fromString("a586b43a-8172-4162-96d9-1f058395cf7b"), EnumType.SKELETON);
 	}
 
-	public HeadPet(World worldIn, UUID owner) {
+	public HeadPet(World worldIn, UUID owner, EnumType type) {
 		super(worldIn);
-		this.setSize(0.5f, 0.5f);
 		this.setOwnerId(owner);
+		this.setSize(0.5f, 0.5f);
 		this.timeTillTreat = this.rand.nextInt(6000) + 6000;
+		this.setType(type);
+		initEntityAI();
 	}
 
 	protected void entityInit()
@@ -75,22 +84,41 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 		super.entityInit();
 		this.dataManager.register(OWNER_UNIQUE_ID, Optional.absent());
 		this.dataManager.register(TEXTURE, "");
+		this.dataManager.register(GNAME, "");
+	}
+
+	public void writeSpawnData(ByteBuf buffer) {
+		ByteBufUtils.writeUTF8String(buffer, type.name);
+	}
+
+	public void readSpawnData(ByteBuf buf) {
+		this.setType(EnumType.valueOf(ByteBufUtils.readUTF8String(buf).toUpperCase()));
 	}
 
 	protected void initEntityAI() {
-		this.aiSit = new EntityAISit(this);
-		this.tasks.addTask(1, new EntityAISwimming(this));
-		this.tasks.addTask(2, this.aiSit);        
-		this.tasks.addTask(4, new EntityAILeapAtTarget(this, 0.4F));
-		this.tasks.addTask(5, new EntityAIAttackMelee(this, 1.0D, true));
-		this.tasks.addTask(6, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
-		this.tasks.addTask(8, new EntityAIWanderAvoidWater(this, 1.0D));
-		this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-		this.tasks.addTask(10, new EntityAILookIdle(this));
-		this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
-		this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
-		this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
-
+	   tasks.taskEntries.clear();
+	   targetTasks.taskEntries.clear();
+		if(this.getOwnerId()==null) {
+			this.tasks.addTask(1, new EntityAISwimming(this));
+			this.tasks.addTask(2, new EntityAILeapAtTarget(this, 0.4F));
+			this.tasks.addTask(3, new EntityAIAttackMelee(this, 1.0D, true));
+			this.tasks.addTask(4, new EntityAIWanderAvoidWater(this, 1.0D));
+			this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, false));
+			this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
+		} else {
+			this.aiSit = new EntityAISit(this);
+			this.tasks.addTask(1, new EntityAISwimming(this));
+			this.tasks.addTask(2, this.aiSit);        
+			this.tasks.addTask(4, new EntityAILeapAtTarget(this, 0.4F));
+			this.tasks.addTask(5, new EntityAIAttackMelee(this, 1.0D, true));
+			this.tasks.addTask(6, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
+			this.tasks.addTask(8, new EntityAIWanderAvoidWater(this, 1.0D));
+			this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+			this.tasks.addTask(10, new EntityAILookIdle(this));
+			this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
+			this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
+			this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
+		}
 	}
 
 	protected void applyEntityAttributes()
@@ -116,7 +144,11 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 			compound.setString("OwnerUUID", this.getOwnerId().toString());
 		}
 
-		compound.setString("Texture", dataManager.get(TEXTURE));
+		compound.setString("Type", getType().getName());
+
+		if(getType()==EnumType.CHAR) {
+			compound.setString("Texture", dataManager.get(TEXTURE));
+		}
 
 		if(this.gameprofile!=null) {
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
@@ -149,6 +181,12 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 		{
 			String s1 = compound.getString("Owner");
 			s = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.getServer(), s1);
+		}
+
+		if(compound.hasKey("Type")) {
+			this.setType(EnumType.valueOf(compound.getString("Type").toUpperCase()));
+		} else {
+			this.setType(EnumType.SKELETON);
 		}
 
 		if (!s.isEmpty())
@@ -191,7 +229,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 		if(this.hurtResistantTime==0&&this.getHealth()<this.getMaxHealth()&&this.ticksExisted%20==0) {
 			this.heal(0.25f);
 		}
-		if(!this.world.isRemote&&this.timeTillTreat%20==0) System.out.println(this.timeTillTreat);
+
 		if(!this.world.isRemote&&!this.activeTreat.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
 			timeTillTreat = this.rand.nextInt(6000) + 6000;
 			timeTillTreat/=this.treatLevel;
@@ -200,6 +238,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 	}
 
 	public boolean processInteract(EntityPlayer player, EnumHand hand) {
+		System.out.println(EnumType.valueOf("SKELETON"));
 		if (this.isOwner(player) && !this.world.isRemote && hand == EnumHand.MAIN_HAND && player.getHeldItem(hand).isEmpty())
 		{
 			sitting = !sitting;
@@ -241,7 +280,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 					} else {
 						this.activeTreat=item.treatDrop.copy();
 						this.treatLevel=1;
-						
+
 						if (!player.capabilities.isCreativeMode)
 						{
 							itemstack.shrink(1);
@@ -280,17 +319,29 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 		return entityIn == this.getOwner();
 	}
 
-	public void setTexture(String texture) {
+	public void setTexture(String texture, String gname) {
 		this.dataManager.set(TEXTURE, texture);
-		this.gameprofile = new GameProfile(this.getUniqueID(), this.getName());
+		this.dataManager.set(GNAME, gname);
+		if(gname!=null&&gname.equalsIgnoreCase("suppergerrie2")) {
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6);
+
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
+
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5.0D);
+		}
+		this.gameprofile = new GameProfile(this.getUniqueID(), gname);
 		this.gameprofile.getProperties().put("textures", new Property("textures", texture));
 	}
 
 	public GameProfile getOwnerProfile() {
 		if(this.gameprofile==null) {
 			String text = dataManager.get(TEXTURE);
+			String gname = dataManager.get(GNAME);
+			if(gname==null||gname.length()<=0) {
+				gname=this.getName();
+			}
 			if(text.length()>0) {
-				this.gameprofile = new GameProfile(this.getUniqueID(), this.getName());
+				this.gameprofile = new GameProfile(this.getUniqueID(), gname);
 				this.gameprofile.getProperties().put("textures", new Property("textures", this.dataManager.get(TEXTURE)));
 			}
 		}
@@ -335,6 +386,79 @@ public class HeadPet extends EntityTameable implements IEntityOwnable {
 	@Override
 	public EntityAgeable createChild(EntityAgeable ageable) {
 		return null;
+	}
+
+
+	public EnumType getType() {
+		return type;
+	}
+
+	public void setType(EnumType type) {
+		this.type = type;
+	}
+
+	@Override
+	public void onDeath(DamageSource source) {
+		if(type.isEvil(this.world.getDifficulty())&&this.world.rand.nextInt(8)==0&&!this.world.isRemote&&this.getOwnerId()!=null) {
+			Entity toSpawn = new HeadPet(this.world, null, this.type);
+			toSpawn.setPosition(this.posX, this.posY, this.posZ);
+
+			this.world.spawnEntity(toSpawn);
+		}
+		super.onDeath(source);
+	}
+
+	@Override
+	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
+	{
+		if(!this.world.isRemote&&(!type.isEvil(this.world.getDifficulty())||this.getOwnerId()==null)) {
+			ItemStack skull = new ItemStack(Items.SKULL, 1, type.metadata);
+
+			if(type==EnumType.CHAR&&this.getOwnerProfile()!=null) {
+				NBTTagCompound nbt = new NBTTagCompound();
+				GameProfile profile = new GameProfile(null, this.getName());
+				profile.getProperties().putAll(this.gameprofile.getProperties());
+				nbt.setTag("SkullOwner", NBTUtil.writeGameProfile(new NBTTagCompound(), profile));
+
+				skull.setTagCompound(nbt);
+			}
+
+			this.entityDropItem(skull, 0.1f);
+		}
+	}
+	
+	public static enum EnumType implements IStringSerializable
+	{
+		SKELETON("skeleton", 0),
+		WITHER("wither", 1),
+		ZOMBIE("zombie", 2),
+		CHAR("char", 3),
+		CREEPER("creeper", 4),
+		DRAGON("dragon", 5);
+
+		private final String name;
+		public final int metadata;
+		private static final String[] SKULL_TYPES = new String[] {"skeleton", "wither", "zombie", "char", "creeper", "dragon"};
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		public boolean isEvil(EnumDifficulty diff) {
+			return diff==EnumDifficulty.PEACEFUL?false:this==SKELETON||this==WITHER||this==ZOMBIE||this==CREEPER;
+		}
+
+		private EnumType(String name, int meta) {
+			this.name = name;
+			this.metadata = meta;
+		}
+
+		public static EnumType fromMetadata(int metadata) {
+			if(metadata<0||metadata>=SKULL_TYPES.length) return EnumType.SKELETON;
+
+			return EnumType.valueOf(SKULL_TYPES[metadata].toUpperCase());
+		}
 	}
 
 }

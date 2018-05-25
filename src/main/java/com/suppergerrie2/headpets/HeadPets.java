@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import com.suppergerrie2.headpets.client.gui.GuiHeadCrafter;
 import com.suppergerrie2.headpets.entities.HeadPet;
 import com.suppergerrie2.headpets.inventory.ContainerHeadCrafter;
-import com.suppergerrie2.headpets.networking.HeadCraftingStartMessage;
+import com.suppergerrie2.headpets.networking.HeadCraftingInfoMessage;
 import com.suppergerrie2.headpets.networking.MessageHandler;
 import com.suppergerrie2.headpets.proxies.IProxy;
 import com.suppergerrie2.headpets.tileentity.TileEntityHeadCrafter;
@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = Reference.MODID, name=Reference.MODNAME, version=Reference.VERSION, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS)
+@Mod.EventBusSubscriber(modid=Reference.MODID)
 public class HeadPets implements IGuiHandler {
 	
 	@Instance
@@ -48,7 +49,7 @@ public class HeadPets implements IGuiHandler {
 		logger = event.getModLog();
 		
 		this.registerEntity(HeadPet.class, "pet");
-		NETWORK_INSTANCE.registerMessage(MessageHandler.class, HeadCraftingStartMessage.class, 0, Side.SERVER);
+		NETWORK_INSTANCE.registerMessage(MessageHandler.class, HeadCraftingInfoMessage.class, 0, Side.SERVER);
 		
 		proxy.preInit(event);
 		logger.info("preInit");
@@ -79,7 +80,5 @@ public class HeadPets implements IGuiHandler {
 		if(ID == Reference.GUIID) return new GuiHeadCrafter(player.inventory, (TileEntityHeadCrafter)world.getTileEntity(new BlockPos(x,y,z)));
 		return null;
 	}
-	
-	
 	
 }

@@ -7,7 +7,6 @@ import com.suppergerrie2.headpets.tileentity.TileEntityHeadCrafter;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -31,7 +30,7 @@ public class ModBlocks {
 	
 	@SubscribeEvent
 	public static void registerItemBlocks(RegistryEvent.Register<Item> event) {
-		event.getRegistry().register(new ItemBlock(headCrafter).setRegistryName(headCrafter.getRegistryName()).setUnlocalizedName(headCrafter.getUnlocalizedName()).setCreativeTab(CreativeTabs.DECORATIONS));
+		event.getRegistry().register(new ItemBlock(headCrafter).setRegistryName(headCrafter.getRegistryName()).setUnlocalizedName(headCrafter.getUnlocalizedName()));
 	}
 	
 	@SubscribeEvent

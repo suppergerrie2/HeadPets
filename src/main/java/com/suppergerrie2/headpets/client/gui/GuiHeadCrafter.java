@@ -7,23 +7,21 @@ import org.lwjgl.input.Keyboard;
 import com.suppergerrie2.headpets.HeadPets;
 import com.suppergerrie2.headpets.Reference;
 import com.suppergerrie2.headpets.inventory.ContainerHeadCrafter;
-import com.suppergerrie2.headpets.networking.HeadCraftingStartMessage;
+import com.suppergerrie2.headpets.networking.HeadCraftingInfoMessage;
 import com.suppergerrie2.headpets.tileentity.TileEntityHeadCrafter;
 
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiHeadCrafter extends GuiContainer {
 
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MODID + ":textures/gui/head_crafter.png");
+	@SuppressWarnings("unused")
 	private final InventoryPlayer player;
 	private final TileEntityHeadCrafter tileentity;
-//    private GuiButton doneBtn;
     private GuiTextField headTextField;
 
 	public GuiHeadCrafter(InventoryPlayer player, TileEntityHeadCrafter tileentity) {
@@ -36,8 +34,7 @@ public class GuiHeadCrafter extends GuiContainer {
 	public void initGui()
     {
 		super.initGui();
-//		doneBtn = this.addButton(new GuiButtonArrow(0, this.width/2-9, 71));
-		this.headTextField = new GuiTextField(2, this.fontRenderer, (this.width - 75) / 2, 41, 75, 15);
+		this.headTextField = new GuiTextField(2, this.fontRenderer, (this.width - 75) / 2, this.guiTop+4, 75, 15);
         this.headTextField.setMaxStringLength(32500);
         this.headTextField.setText(tileentity.getTextureString());
         this.headTextField.setFocused(false);
@@ -59,7 +56,8 @@ public class GuiHeadCrafter extends GuiContainer {
 	
 	public void onGuiClosed()
     {
-        Keyboard.enableRepeatEvents(false);
+		HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingInfoMessage(headTextField.getText(), tileentity.getPos(), headTextField.getText().length()<=16));
+		Keyboard.enableRepeatEvents(false);
     }
 	
 	protected void keyTyped(char typedChar, int keyCode) throws IOException
@@ -68,7 +66,7 @@ public class GuiHeadCrafter extends GuiContainer {
 			super.keyTyped(typedChar, keyCode);
 		}
 		this.headTextField.textboxKeyTyped(typedChar, keyCode);
-		HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingStartMessage(headTextField.getText(), tileentity.getPos()));
+		HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingInfoMessage(headTextField.getText(), tileentity.getPos(), headTextField.getText().length()<=16));
     }
 	
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
@@ -87,14 +85,4 @@ public class GuiHeadCrafter extends GuiContainer {
 		this.drawTexturedModalRect(this.guiLeft+79, this.guiTop+34, 176, 0, (int) (24*percentDone), 17);
         this.headTextField.drawTextBox();
 	}
-
-//	protected void actionPerformed(GuiButton button)
-//    {
-//		if(button == doneBtn) {
-//			if(headTextField.getText().length()>0) {
-//				System.out.println("Start crafting");
-//				HeadPets.NETWORK_INSTANCE.sendToServer(new HeadCraftingStartMessage(headTextField.getText(), tileentity.getPos()));
-//			}
-//		}
-//    }
 }

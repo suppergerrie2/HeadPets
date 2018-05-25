@@ -1,0 +1,10 @@
+item.spawn_pet.name=Spawn Head Pet
+
+entity.pet.name=Head Pet
+
+tile.head_crafter.name=Head Crafter
+gui.texturemode=Texture
+gui.namemode=Player
+
+item.treat=Treat
+item.craft_wand.name=Wand of Heads

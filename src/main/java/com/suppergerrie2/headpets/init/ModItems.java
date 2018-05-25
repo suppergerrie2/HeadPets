@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.suppergerrie2.headpets.Reference;
+import com.suppergerrie2.headpets.items.ItemCraftWand;
+import com.suppergerrie2.headpets.items.ItemSpawnPet;
 import com.suppergerrie2.headpets.items.ItemTreat;
-import com.suppergerrie2.headpets.items.SpawnPet;
 import com.suppergerrie2.headpets.items.crafting.RecipeHeadPet;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockStone;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
@@ -26,10 +28,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @EventBusSubscriber(modid=Reference.MODID)
 public class ModItems {
 
+	public static final CreativeTabs tabHeadPets = new CreativeTabs("tabHeadPets") {
+
+		@Override
+		public ItemStack getTabIconItem() {
+			return new ItemStack(Items.SKULL, 1 , 3);
+		}
+
+		@Override
+		public boolean hasSearchBar() {
+			return true;
+		}
+
+	}.setBackgroundImageName("item_search.png");
+
 	public static Item spawnPet;
-	public static Item treat;
+	public static Item craftWand;
 	private static List<ItemTreat> treats = new ArrayList<ItemTreat>();
-	
+
 	private final static ItemStack[] treatTypes = new ItemStack[] {
 			new ItemStack(Blocks.LOG2, 1,  0/*BlockPlanks.EnumType.ACACIA.getMetadata()*/),
 			new ItemStack(Blocks.STONE, 1, BlockStone.EnumType.ANDESITE.getMetadata()),
@@ -86,31 +102,34 @@ public class ModItems {
 			new ItemStack(Blocks.WOOL, 1, EnumDyeColor.WHITE.getMetadata()),
 			new ItemStack(Blocks.YELLOW_SHULKER_BOX),
 			new ItemStack(Blocks.WOOL, 1, EnumDyeColor.YELLOW.getMetadata()),
-			
+
 	};
-	
+
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
-		spawnPet = new SpawnPet();
+		spawnPet = new ItemSpawnPet();
+		craftWand = new ItemCraftWand();
+
 		for(ItemStack stack : treatTypes) {
 			treats.add(new ItemTreat(stack));
 		}
-		event.getRegistry().registerAll(spawnPet);
+		event.getRegistry().registerAll(spawnPet, craftWand);
 		event.getRegistry().registerAll(treats.toArray(new ItemTreat[0]));
 	}
-	
+
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event) {
 		registerRender(spawnPet);
+		registerRender(craftWand);
 		for(ItemTreat item : treats) {
 			registerRender(item);
 		}
 	}
-	
+
 	private static void registerRender(Item item) {
 		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation( item.getRegistryName(), "inventory"));
 	}
-	
+
 	@SubscribeEvent
 	public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 		IRecipe recipeHeadPet = new RecipeHeadPet().setRegistryName("head_pet_recipe");

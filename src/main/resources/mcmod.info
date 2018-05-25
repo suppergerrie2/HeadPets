@@ -1,6 +1,6 @@
 [
 {
-  "modid": "spets",
+  "modid": "sheadpets",
   "name": "HeadPets Mod",
   "description": "This mod adds head pets.",
   "version": "${version}",

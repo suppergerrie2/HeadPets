@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "sheadpets:head_crafter" },
+        "facing=south": { "model": "sheadpets:head_crafter", "y": 180 },
+        "facing=west":  { "model": "sheadpets:head_crafter", "y": 270 },
+        "facing=east":  { "model": "sheadpets:head_crafter", "y": 90 }
+    }
+}

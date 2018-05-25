@@ -1,0 +1,17 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "logWood"
+    },
+    {
+      "item": "minecraft:skull",
+      "data": 32767
+    }
+  ],
+  "result": {
+    "item": "sheadpets:craft_wand",
+    "count": 1
+  }
+}

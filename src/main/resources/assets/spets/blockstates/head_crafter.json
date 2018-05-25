@@ -1,8 +1,0 @@
-{
-    "variants": {
-        "facing=north": { "model": "spets:head_crafter" },
-        "facing=south": { "model": "spets:head_crafter", "y": 180 },
-        "facing=west":  { "model": "spets:head_crafter", "y": 270 },
-        "facing=east":  { "model": "spets:head_crafter", "y": 90 }
-    }
-}

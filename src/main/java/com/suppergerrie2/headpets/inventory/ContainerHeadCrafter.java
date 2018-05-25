@@ -53,14 +53,14 @@ public class ContainerHeadCrafter extends Container {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index < 2)
+            if (index < this.inventorySlots.size())
             {
                 if (!this.mergeItemStack(itemstack1, 2, this.inventorySlots.size(), true))
                 {
                     return ItemStack.EMPTY;
                 }
             }
-            else if (!this.mergeItemStack(itemstack1, 0, 2, false))
+            else if (!this.mergeItemStack(itemstack1, 0, this.inventorySlots.size(), false))
             {
                 return ItemStack.EMPTY;
             }
