@@ -67,7 +67,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAd
 	private EnumType type;
 
 	public HeadPet(World worldIn) {
-		this(worldIn, UUID.fromString("a586b43a-8172-4162-96d9-1f058395cf7b"), EnumType.SKELETON);
+		this(worldIn, null, EnumType.SKELETON);
 	}
 
 	public HeadPet(World worldIn, UUID owner, EnumType type) {
@@ -88,6 +88,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAd
 	}
 
 	public void writeSpawnData(ByteBuf buffer) {
+		System.out.println(type.name);
 		ByteBufUtils.writeUTF8String(buffer, type.name);
 	}
 
@@ -204,13 +205,16 @@ public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAd
 		if (compound.hasKey("GameProfile", 10))
 		{
 			this.gameprofile = NBTUtil.readGameProfileFromNBT(compound.getCompoundTag("GameProfile"));
+			if(this.gameprofile.getName()!=null) {
+				this.dataManager.set(GNAME, this.gameprofile.getName());
+			}
 		}
 
 		if(compound.hasKey("Texture")) {
 			this.dataManager.set(TEXTURE, compound.getString("Texture"));
 		}
 
-		if(compound.hasKey("Sitting")) {
+		if(this.aiSit!=null&&compound.hasKey("Sitting")) {
 			sitting = compound.getBoolean("Sitting");
 			this.aiSit.setSitting(sitting);
 		}
@@ -320,7 +324,7 @@ public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAd
 
 	public void setTexture(String texture, String gname) {
 		this.dataManager.set(TEXTURE, texture);
-		this.dataManager.set(GNAME, gname);
+		this.dataManager.set(GNAME, gname==null?"":gname);
 		if(gname!=null&&gname.equalsIgnoreCase("suppergerrie2")) {
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6);
 
@@ -395,10 +399,10 @@ public class HeadPet extends EntityTameable implements IEntityOwnable, IEntityAd
 	public void setType(EnumType type) {
 		this.type = type;
 	}
-
+	
 	@Override
 	public void onDeath(DamageSource source) {
-		if(type.isEvil(this.world.getDifficulty())&&this.world.rand.nextInt(8)==0&&!this.world.isRemote&&this.getOwnerId()!=null) {
+		if(type.isEvil(this.world.getDifficulty())&&this.world.rand.nextInt(8)<=2&&!this.world.isRemote&&this.getOwnerId()!=null) {
 			Entity toSpawn = new HeadPet(this.world, null, this.type);
 			toSpawn.setPosition(this.posX, this.posY, this.posZ);
 
