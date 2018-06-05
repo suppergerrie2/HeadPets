@@ -6,8 +6,10 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 import com.suppergerrie2.headpets.HeadPets;
+import com.suppergerrie2.headpets.entities.EntityHead.EnumType;
 import com.suppergerrie2.headpets.items.ItemTreat;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
@@ -36,8 +38,10 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class EntityHeadPet extends EntityHead implements IEntityOwnable  {
+public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntityAdditionalSpawnData  {
 
 	protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(EntityHeadPet.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
@@ -78,6 +82,16 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable  {
 		this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
 		this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
 		this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
+	}
+	
+	@Override
+	public void writeSpawnData(ByteBuf buffer) {
+		super.writeSpawnData(buffer);
+	}
+
+	@Override
+	public void readSpawnData(ByteBuf buf) {
+		super.readSpawnData(buf);
 	}
 
 	protected void applyEntityAttributes()

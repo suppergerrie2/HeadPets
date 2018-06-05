@@ -1,7 +1,5 @@
 package com.suppergerrie2.headpets;
 
-import java.util.Set;
-
 import com.google.common.collect.ImmutableList;
 import com.suppergerrie2.headpets.entities.EntityHeadEvil;
 import com.suppergerrie2.headpets.entities.EntityHeadPet;
@@ -11,6 +9,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.MissingMappings.Mapping;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;;
 
 public class EventHandler {
 
@@ -23,16 +22,15 @@ public class EventHandler {
 		for(Mapping<EntityEntry> mapping : mappings) {
 			if(mapping.key.equals(new ResourceLocation(Reference.MODID, "pet"))) {
 				System.out.println(mapping.key);
-				Set<ResourceLocation> t = mapping.registry.getKeys();
-				System.out.println(t);
+				mapping.remap(headPet);
 			}
 		}
 	}
 	
 	@SubscribeEvent
 	public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
-		headPet = new EntityEntry(EntityHeadPet.class, "head_pet").setRegistryName("head_pet");
-		headEvil = new EntityEntry(EntityHeadEvil.class, "head_evil").setRegistryName("head_evil");
+		headPet = EntityEntryBuilder.create().entity(EntityHeadPet.class).name("head_pet").tracker(80, 1, false).id(new ResourceLocation(Reference.MODID, "head_pet"), 0).build();
+		headEvil = EntityEntryBuilder.create().entity(EntityHeadEvil.class).name("head_evil").tracker(80, 1, false).id(new ResourceLocation(Reference.MODID, "head_evil"), 1).build();
 	    event.getRegistry().registerAll(headPet, headEvil);
 	}
 	
