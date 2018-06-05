@@ -3,8 +3,8 @@ package com.suppergerrie2.headpets.items;
 import com.google.common.collect.Iterables;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.suppergerrie2.headpets.entities.HeadPet;
-import com.suppergerrie2.headpets.entities.HeadPet.EnumType;
+import com.suppergerrie2.headpets.entities.EntityHead.EnumType;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.init.ModItems;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,7 +38,7 @@ public class ItemSpawnPet extends Item {
 			if(itemstack.hasTagCompound()) {
 				type = EnumType.valueOf(itemstack.getTagCompound().getString("Type").toUpperCase());
 			}
-			HeadPet pet = new HeadPet(worldIn, player.getGameProfile().getId(), type);
+			EntityHeadPet pet = new EntityHeadPet(worldIn, player.getGameProfile().getId(), type);
 			
 			if(type==EnumType.CHAR) {
 				GameProfile profile = null;

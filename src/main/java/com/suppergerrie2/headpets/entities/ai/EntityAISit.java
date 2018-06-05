@@ -1,17 +1,17 @@
 package com.suppergerrie2.headpets.entities.ai;
 
-import com.suppergerrie2.headpets.entities.HeadPet;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 
 public class EntityAISit extends EntityAIBase
 {
-    private final HeadPet pet;
+    private final EntityHeadPet pet;
     /** If the EntityTameable is sitting. */
     private boolean isSitting;
 
-    public EntityAISit(HeadPet entityIn)
+    public EntityAISit(EntityHeadPet entityIn)
     {
         this.pet = entityIn;
         this.setMutexBits(5);

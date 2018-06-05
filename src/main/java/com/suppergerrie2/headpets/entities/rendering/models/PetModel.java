@@ -1,6 +1,6 @@
 package com.suppergerrie2.headpets.entities.rendering.models;
 
-import com.suppergerrie2.headpets.entities.HeadPet;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelDragonHead;
@@ -23,7 +23,7 @@ public class PetModel extends ModelBase {
 		GlStateManager.pushMatrix();
 		ModelBase modelbase = this.skeletonHead;
 
-		switch (((HeadPet)entity).getType())
+		switch (((EntityHeadPet)entity).getType())
 		{
 		case ZOMBIE:
 			modelbase = this.humanoidHead;

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-import com.suppergerrie2.headpets.entities.HeadPet;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.entities.rendering.models.PetModel;
 
 import net.minecraft.client.Minecraft;
@@ -16,7 +16,7 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPet extends RenderLiving<HeadPet> {
+public class RenderPet extends RenderLiving<EntityHeadPet> {
 
 	private static final ResourceLocation SKELETON_TEXTURES = new ResourceLocation("textures/entity/skeleton/skeleton.png");
 	private static final ResourceLocation WITHER_SKELETON_TEXTURES = new ResourceLocation("textures/entity/skeleton/wither_skeleton.png");
@@ -29,7 +29,7 @@ public class RenderPet extends RenderLiving<HeadPet> {
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(HeadPet entity) {
+	protected ResourceLocation getEntityTexture(EntityHeadPet entity) {
 		ResourceLocation resourcelocation = DefaultPlayerSkin.getDefaultSkinLegacy();
 
 		switch (entity.getType())
@@ -42,10 +42,10 @@ public class RenderPet extends RenderLiving<HeadPet> {
 		case ZOMBIE:
 			return ZOMBIE_TEXTURES;
 		case CHAR:
-			if (entity.getOwnerProfile() != null)
+			if (entity.getTextureProfile() != null)
 			{
 				Minecraft minecraft = Minecraft.getMinecraft();
-				Map<Type, MinecraftProfileTexture> map = minecraft.getSkinManager().loadSkinFromCache(entity.getOwnerProfile());
+				Map<Type, MinecraftProfileTexture> map = minecraft.getSkinManager().loadSkinFromCache(entity.getTextureProfile());
 
 				if (map.containsKey(Type.SKIN))
 				{
@@ -53,7 +53,7 @@ public class RenderPet extends RenderLiving<HeadPet> {
 				}
 				else
 				{
-					UUID uuid = EntityPlayer.getUUID(entity.getOwnerProfile());
+					UUID uuid = EntityPlayer.getUUID(entity.getTextureProfile());
 					resourcelocation = DefaultPlayerSkin.getDefaultSkin(uuid);
 				}
 			}
@@ -67,11 +67,11 @@ public class RenderPet extends RenderLiving<HeadPet> {
 	}
 
 	@Override
-	protected void applyRotations(HeadPet entityLiving, float p_77043_2_, float rotationYaw, float partialTicks)
+	protected void applyRotations(EntityHeadPet entityLiving, float p_77043_2_, float rotationYaw, float partialTicks)
 	{
 		super.applyRotations(entityLiving, p_77043_2_, rotationYaw, partialTicks);
-		if(entityLiving.getOwnerProfile()!=null&&entityLiving.getOwnerProfile().getName()!=null) {
-			if(entityLiving.getOwnerProfile().getName().equalsIgnoreCase("Dinnerbone"))	{		
+		if(entityLiving.getTextureProfile()!=null&&entityLiving.getTextureProfile().getName()!=null) {
+			if(entityLiving.getTextureProfile().getName().equalsIgnoreCase("Dinnerbone"))	{		
 				GlStateManager.translate(0.0F, entityLiving.height + 0.1F, 0.0F);
 				GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
 			}

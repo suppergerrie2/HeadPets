@@ -3,7 +3,8 @@ package com.suppergerrie2.headpets;
 import org.apache.logging.log4j.Logger;
 
 import com.suppergerrie2.headpets.client.gui.GuiHeadCrafter;
-import com.suppergerrie2.headpets.entities.HeadPet;
+import com.suppergerrie2.headpets.entities.EntityHeadEvil;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.inventory.ContainerHeadCrafter;
 import com.suppergerrie2.headpets.networking.HeadCraftingInfoMessage;
 import com.suppergerrie2.headpets.networking.MessageHandler;
@@ -15,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -48,8 +50,11 @@ public class HeadPets implements IGuiHandler {
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
 		
-		this.registerEntity(HeadPet.class, "pet");
+//		this.registerEntity(EntityHeadPet.class, "head_pet");
+//		this.registerEntity(EntityHeadEvil.class, "head_evil");
 		NETWORK_INSTANCE.registerMessage(MessageHandler.class, HeadCraftingInfoMessage.class, 0, Side.SERVER);
+		
+		MinecraftForge.EVENT_BUS.register(new com.suppergerrie2.headpets.EventHandler());
 		
 		proxy.preInit(event);
 		logger.info("preInit");

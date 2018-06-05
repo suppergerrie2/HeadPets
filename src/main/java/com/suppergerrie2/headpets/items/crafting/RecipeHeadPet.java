@@ -1,6 +1,6 @@
 package com.suppergerrie2.headpets.items.crafting;
 
-import com.suppergerrie2.headpets.entities.HeadPet;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.init.ModItems;
 
 import net.minecraft.init.Items;
@@ -29,9 +29,9 @@ public class RecipeHeadPet extends net.minecraftforge.registries.IForgeRegistryE
 	public ItemStack getCraftingResult(InventoryCrafting inv) {
 		ItemStack result = new ItemStack(ModItems.spawnPet);
 		NBTTagCompound tag = new NBTTagCompound();
-		HeadPet.EnumType type = HeadPet.EnumType.fromMetadata(inv.getStackInRowAndColumn(1, 1).getMetadata());
+		EntityHeadPet.EnumType type = EntityHeadPet.EnumType.fromMetadata(inv.getStackInRowAndColumn(1, 1).getMetadata());
 		tag.setString("Type", type.getName());
-		if(type==HeadPet.EnumType.CHAR) {
+		if(type==EntityHeadPet.EnumType.CHAR) {
 			if(inv.getStackInRowAndColumn(1, 1).getSubCompound("SkullOwner")!=null) {
 				tag.setTag("GameProfile", inv.getStackInRowAndColumn(1, 1).getSubCompound("SkullOwner"));
 			}

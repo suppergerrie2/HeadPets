@@ -1,6 +1,6 @@
 package com.suppergerrie2.headpets.entities.ai;
 
-import com.suppergerrie2.headpets.entities.HeadPet;
+import com.suppergerrie2.headpets.entities.EntityHeadPet;
 
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public class EntityAIFollowOwner extends EntityAIBase {
 
-	private final HeadPet pet;
+	private final EntityHeadPet pet;
 	private EntityLivingBase owner;
 	World world;
 	private final double followSpeed;
@@ -28,7 +28,7 @@ public class EntityAIFollowOwner extends EntityAIBase {
 	float minDist;
 	private float oldWaterCost;
 
-	public EntityAIFollowOwner(HeadPet pet, double followSpeedIn, float minDistIn, float maxDistIn)
+	public EntityAIFollowOwner(EntityHeadPet pet, double followSpeedIn, float minDistIn, float maxDistIn)
 	{
 		this.pet = pet;
 		this.world = pet.world;
