@@ -1,7 +1,5 @@
 package com.suppergerrie2.headpets.entities;
 
-import com.suppergerrie2.headpets.entities.EntityHead.EnumType;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackMelee;
@@ -54,5 +52,10 @@ public class EntityHeadEvil extends EntityHead {
 
 		return flag;
 	}
-
+	
+	
+	
+	protected boolean canDespawn() {
+        return true;
+    }
 }

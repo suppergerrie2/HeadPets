@@ -4,11 +4,22 @@ import java.util.Random;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.suppergerrie2.headpets.HeadPets;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.entity.boss.EntityWither;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntityWitherSkeleton;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
@@ -16,7 +27,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
@@ -142,7 +152,28 @@ public abstract class EntityHead extends EntityTameable implements IEntityAdditi
 	@Override
 	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
 	{
-		
+		if(!this.world.isRemote) {
+			ItemStack skull = new ItemStack(Items.SKULL, 1, type.metadata);
+
+			if(type==EnumType.CHAR&&this.getTextureProfile()!=null) {
+				NBTTagCompound nbt = new NBTTagCompound();
+				
+				String name;
+				if(this.getTextureProfile().getName()!=null&&this.getTextureProfile().getName().length()<=16) {
+					name = this.getTextureProfile().getName();
+				} else {
+					name = this.getName();
+				}
+				GameProfile profile = new GameProfile(null, name);
+
+				profile.getProperties().putAll(this.gameprofile.getProperties());
+				nbt.setTag("SkullOwner", NBTUtil.writeGameProfile(new NBTTagCompound(), profile));
+
+				skull.setTagCompound(nbt);
+			}
+
+			this.entityDropItem(skull, 0.1f);
+		}
 	}
 	
 	public static enum EnumType implements IStringSerializable
@@ -183,6 +214,31 @@ public abstract class EntityHead extends EntityTameable implements IEntityAdditi
 			if(meta==3) meta = 4;
 			
 			return EnumType.fromMetadata(meta);
+		}
+
+		public static EnumType getTypeForEntity(Entity entity) {
+			EnumType type;
+			
+			if(entity==null) {
+				HeadPets.logger.warn("Trying to get head type for null entity!");
+				type = null;
+			} else if(entity instanceof EntitySkeleton) {
+				type = SKELETON;
+			} else if(entity instanceof EntityWither || entity instanceof EntityWitherSkeleton) {
+				type = WITHER;
+			}  else if(entity instanceof EntityZombie) {
+				type = ZOMBIE;
+			} else if(entity instanceof EntityPlayer) {
+				type = CHAR;
+			} else if(entity instanceof EntityCreeper) {
+				type = CREEPER;
+			} else if(entity instanceof EntityDragon) {
+				type = DRAGON;
+			} else {
+				type = null;
+			}
+			
+			return type;
 		}
 	}
 

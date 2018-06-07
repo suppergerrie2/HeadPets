@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-import com.suppergerrie2.headpets.entities.EntityHeadPet;
+import com.suppergerrie2.headpets.entities.EntityHead;
 import com.suppergerrie2.headpets.entities.rendering.models.PetModel;
 
 import net.minecraft.client.Minecraft;
@@ -16,7 +16,7 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderPet extends RenderLiving<EntityHeadPet> {
+public class RenderEntityHead extends RenderLiving<EntityHead> {
 
 	private static final ResourceLocation SKELETON_TEXTURES = new ResourceLocation("textures/entity/skeleton/skeleton.png");
 	private static final ResourceLocation WITHER_SKELETON_TEXTURES = new ResourceLocation("textures/entity/skeleton/wither_skeleton.png");
@@ -24,12 +24,12 @@ public class RenderPet extends RenderLiving<EntityHeadPet> {
 	private static final ResourceLocation CREEPER_TEXTURES = new ResourceLocation("textures/entity/creeper/creeper.png");
 	private static final ResourceLocation DRAGON_TEXTURES = new ResourceLocation("textures/entity/enderdragon/dragon.png");
 
-	public RenderPet(RenderManager rendermanagerIn) {
+	public RenderEntityHead(RenderManager rendermanagerIn) {
 		super(rendermanagerIn, new PetModel(), 0.3f);
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityHeadPet entity) {
+	protected ResourceLocation getEntityTexture(EntityHead entity) {
 		ResourceLocation resourcelocation = DefaultPlayerSkin.getDefaultSkinLegacy();
 
 		switch (entity.getType())
@@ -67,7 +67,7 @@ public class RenderPet extends RenderLiving<EntityHeadPet> {
 	}
 
 	@Override
-	protected void applyRotations(EntityHeadPet entityLiving, float p_77043_2_, float rotationYaw, float partialTicks)
+	protected void applyRotations(EntityHead entityLiving, float p_77043_2_, float rotationYaw, float partialTicks)
 	{
 		super.applyRotations(entityLiving, p_77043_2_, rotationYaw, partialTicks);
 		if(entityLiving.getTextureProfile()!=null&&entityLiving.getTextureProfile().getName()!=null) {

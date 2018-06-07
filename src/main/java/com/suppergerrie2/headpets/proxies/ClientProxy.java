@@ -1,7 +1,8 @@
 package com.suppergerrie2.headpets.proxies;
 
+import com.suppergerrie2.headpets.entities.EntityHeadEvil;
 import com.suppergerrie2.headpets.entities.EntityHeadPet;
-import com.suppergerrie2.headpets.entities.rendering.RenderPet;
+import com.suppergerrie2.headpets.entities.rendering.RenderEntityHead;
 
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -19,7 +20,15 @@ public class ClientProxy implements IProxy {
 
 			@Override
 			public Render<? super EntityHeadPet> createRenderFor(RenderManager manager) {
-				return new RenderPet(manager);
+				return new RenderEntityHead(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityHeadEvil.class, new IRenderFactory<EntityHeadEvil>() {
+
+			@Override
+			public Render<? super EntityHeadEvil> createRenderFor(RenderManager manager) {
+				return new RenderEntityHead(manager);
 			}
 		});
 	}

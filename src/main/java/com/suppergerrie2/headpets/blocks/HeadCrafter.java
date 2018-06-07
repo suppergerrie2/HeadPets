@@ -1,5 +1,10 @@
 package com.suppergerrie2.headpets.blocks;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import com.google.common.collect.Lists;
 import com.suppergerrie2.headpets.HeadPets;
 import com.suppergerrie2.headpets.Reference;
 import com.suppergerrie2.headpets.init.ModItems;
@@ -14,6 +19,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +29,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -33,12 +42,16 @@ public class HeadCrafter extends Block {
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 
+	protected static final AxisAlignedBB BOTTOM_PART = new AxisAlignedBB(0,0,0,1,0.5,1);
+	protected static final AxisAlignedBB TOP_PART = new AxisAlignedBB(.25, 0.5, 0.25, 0.75, 1, 0.75);
+
 	public HeadCrafter(Material materialIn) {
 		super(materialIn);
 		this.setRegistryName("head_crafter");
 		this.setUnlocalizedName("head_crafter");
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		this.setCreativeTab(ModItems.tabHeadPets);
+		this.setHardness(1.5F).setResistance(10.0F);
 	}
 
 	public boolean isOpaqueCube(IBlockState state)
@@ -59,6 +72,12 @@ public class HeadCrafter extends Block {
 	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
 	{
 		return face == EnumFacing.DOWN ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
+	}
+
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState)
+	{
+		addCollisionBoxToList(pos, entityBox, collidingBoxes, BOTTOM_PART);
+		addCollisionBoxToList(pos, entityBox, collidingBoxes, TOP_PART);
 	}
 
 	public boolean hasTileEntity(IBlockState state) {
@@ -82,7 +101,7 @@ public class HeadCrafter extends Block {
 					} else {
 						player.openGui(HeadPets.instance, Reference.GUIID, world, pos.getX(), pos.getY(), pos.getZ());
 					}
-					
+
 				}
 			} else {
 				player.openGui(HeadPets.instance, Reference.GUIID, world, pos.getX(), pos.getY(), pos.getZ());
@@ -144,5 +163,33 @@ public class HeadCrafter extends Block {
 	protected BlockStateContainer createBlockState()
 	{
 		return new BlockStateContainer(this, new IProperty[] {FACING});
+	}
+
+	@Nullable
+	public RayTraceResult collisionRayTrace(IBlockState blockState, World worldIn, BlockPos pos, Vec3d start, Vec3d end)
+	{
+		List<RayTraceResult> list = Lists.<RayTraceResult>newArrayList();
+
+		list.add(this.rayTrace(pos, start, end, BOTTOM_PART));
+		list.add(this.rayTrace(pos, start, end, TOP_PART));
+
+		RayTraceResult raytraceresult1 = null;
+		double d1 = 0.0D;
+
+		for (RayTraceResult raytraceresult : list)
+		{
+			if (raytraceresult != null)
+			{
+				double d0 = raytraceresult.hitVec.squareDistanceTo(end);
+
+				if (d0 > d1)
+				{
+					raytraceresult1 = raytraceresult;
+					d1 = d0;
+				}
+			}
+		}
+
+		return raytraceresult1;
 	}
 }

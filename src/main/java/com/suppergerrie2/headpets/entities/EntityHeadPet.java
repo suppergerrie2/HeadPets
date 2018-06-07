@@ -6,10 +6,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 import com.suppergerrie2.headpets.HeadPets;
-import com.suppergerrie2.headpets.entities.EntityHead.EnumType;
 import com.suppergerrie2.headpets.items.ItemTreat;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
@@ -38,7 +36,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntityAdditionalSpawnData  {
@@ -52,6 +49,8 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 	int treatLevel = 0;
 
 	int timeTillTreat;
+	
+	boolean becameEvil = false;
 
 	public EntityHeadPet(World worldIn) {
 		this(worldIn, null, EnumType.SKELETON);
@@ -84,16 +83,6 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
 	}
 	
-	@Override
-	public void writeSpawnData(ByteBuf buffer) {
-		super.writeSpawnData(buffer);
-	}
-
-	@Override
-	public void readSpawnData(ByteBuf buf) {
-		super.readSpawnData(buf);
-	}
-
 	protected void applyEntityAttributes()
 	{
 		super.applyEntityAttributes();
@@ -183,6 +172,24 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		}
 	}
 
+	@Override
+	public void onDeath(DamageSource source) {
+		if(this.world.getDifficulty()!=EnumDifficulty.PEACEFUL&&this.world.rand.nextInt(8)<=2&&!this.world.isRemote&&this.getOwnerId()!=null) {
+			EnumType newType = this.type;
+			if(!newType.isEvil()) {
+				newType = EnumType.getRandomEvilType(this.world.rand);
+			}
+			
+			Entity toSpawn = new EntityHeadEvil(this.world, newType);
+			toSpawn.setPosition(this.posX, this.posY, this.posZ);
+	
+			this.world.spawnEntity(toSpawn);
+			
+			becameEvil = true;
+		}
+		super.onDeath(source);
+	}
+
 	public boolean processInteract(EntityPlayer player, EnumHand hand) {
 		if (this.isOwner(player) && !this.world.isRemote && hand == EnumHand.MAIN_HAND && player.getHeldItem(hand).isEmpty())
 		{
@@ -238,6 +245,48 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		return super.processInteract(player, hand);
 	}
 
+	public boolean attackEntityAsMob(Entity entityIn)
+	{
+		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+
+		if (flag)
+		{
+			this.applyEnchantments(this, entityIn);
+		}
+
+		return flag;
+	}
+
+	public boolean attackEntityFrom(DamageSource source, float amount)
+	{
+		if(sitting) {
+			this.aiSit.setSitting(false);
+			sitting = false;
+		}
+		return super.attackEntityFrom(source, amount);
+	}
+	
+	@Override
+	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
+	{
+		if(!this.becameEvil) {
+			super.dropLoot(wasRecentlyHit, lootingModifier, source);
+		}
+	}
+
+	public void setAttackTarget(@Nullable EntityLivingBase entitylivingbaseIn)
+	{
+		if(entitylivingbaseIn instanceof EntityCreeper) {
+			return;
+		}
+	
+		super.setAttackTarget(entitylivingbaseIn);
+	}
+
+	public boolean isTamed() {
+		return true;
+	}
+
 	@Override
 	public UUID getOwnerId()
 	{
@@ -262,55 +311,5 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 	public boolean isOwner(EntityLivingBase entityIn)
 	{
 		return entityIn == this.getOwner();
-	}
-
-	public boolean attackEntityAsMob(Entity entityIn)
-	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
-
-		if (flag)
-		{
-			this.applyEnchantments(this, entityIn);
-		}
-
-		return flag;
-	}
-
-	public void setAttackTarget(@Nullable EntityLivingBase entitylivingbaseIn)
-	{
-		if(entitylivingbaseIn instanceof EntityCreeper) {
-			return;
-		}
-
-		super.setAttackTarget(entitylivingbaseIn);
-	}
-
-	public boolean attackEntityFrom(DamageSource source, float amount)
-	{
-		if(sitting) {
-			this.aiSit.setSitting(false);
-			sitting = false;
-		}
-		return super.attackEntityFrom(source, amount);
-	}
-
-	public boolean isTamed() {
-		return true;
-	}
-
-	@Override
-	public void onDeath(DamageSource source) {
-		if(this.world.getDifficulty()!=EnumDifficulty.PEACEFUL&&this.world.rand.nextInt(8)<=2&&!this.world.isRemote&&this.getOwnerId()!=null) {
-			EnumType newType = this.type;
-			if(!newType.isEvil()) {
-				newType = EnumType.getRandomEvilType(this.world.rand);
-			}
-			
-			Entity toSpawn = new EntityHeadEvil(this.world, newType);
-			toSpawn.setPosition(this.posX, this.posY, this.posZ);
-
-			this.world.spawnEntity(toSpawn);
-		}
-		super.onDeath(source);
 	}
 }
