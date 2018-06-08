@@ -11,7 +11,6 @@ import com.mojang.authlib.properties.Property;
 import com.suppergerrie2.headpets.inventory.ItemHandlerHeadCrafter;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
