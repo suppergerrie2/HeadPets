@@ -55,13 +55,23 @@ public class EntityHeadEvil extends EntityHead {
 
 		return flag;
 	}
-
+	
 	@Override
-	protected void createRunningParticles() {
-		super.createRunningParticles();
-
-		this.world.spawnParticle(EnumParticleTypes.BLOCK_CRACK, this.posX + ((double)this.rand.nextFloat() - 0.5D) * (double)this.width, this.getEntityBoundingBox().minY + 0.1D, this.posZ + ((double)this.rand.nextFloat() - 0.5D) * (double)this.width, -this.motionX * 4.0D, 1.5D, -this.motionZ * 4.0D, Block.getStateId(Blocks.REDSTONE_BLOCK.getDefaultState()));
-	}
+	public void spawnRunningParticles()
+    {
+		super.spawnRunningParticles();
+		
+		if(this.rand.nextInt(16)==0) {
+			this.world.spawnParticle(EnumParticleTypes.BLOCK_DUST,
+					this.posX + ((double)this.rand.nextFloat() - 0.5D) * (double)this.width,
+					this.getEntityBoundingBox().maxY + 0.1D,
+					this.posZ + ((double)this.rand.nextFloat() - 0.5D) * (double)this.width,
+					(this.rand.nextFloat()-0.5f)*0.25f,
+					0.15D,
+					(this.rand.nextFloat()-0.5f)*0.25f,
+					Block.getStateId(Blocks.REDSTONE_BLOCK.getDefaultState()));
+		}
+    }
 
 	@Override
 	protected boolean canDespawn() {
