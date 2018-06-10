@@ -44,8 +44,9 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 
 	EntityAISit aiSit;
 	boolean sitting = false;
-
-	ItemStack activeTreat = ItemStack.EMPTY;
+	
+//	ItemStack activeTreat = ItemStack.EMPTY;
+	ItemTreat activeTreat = null;
 	int treatLevel = 0;
 
 	int timeTillTreat;
@@ -108,13 +109,17 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 
 		compound.setBoolean("Sitting", sitting);
 
-		if(!this.activeTreat.isEmpty()) {
+		if(this.activeTreat!=null){
 			NBTTagCompound tag = new NBTTagCompound();
-			this.activeTreat.writeToNBT(tag);
+			new ItemStack(this.activeTreat).writeToNBT(tag);
 			compound.setTag("ActiveTreat", tag);
 			compound.setInteger("TreatLevel", this.treatLevel);
 			compound.setInteger("TreatTime", this.timeTillTreat);
 		}
+		
+		//DEBUG REMOVE THIS BEFORE RELEASE!
+		HeadPets.logger.fatal("WHY IS THIS STILL HERE?");
+		this.timeTillTreat = 0;
 
 	}
 
@@ -151,7 +156,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		}
 
 		if(compound.hasKey("ActiveTreat")) {
-			this.activeTreat = new ItemStack((NBTTagCompound) compound.getTag("ActiveTreat"));
+			this.activeTreat = (ItemTreat) new ItemStack((NBTTagCompound) compound.getTag("ActiveTreat")).getItem();
 			this.treatLevel = compound.getInteger("TreatLevel");
 			this.timeTillTreat = compound.getInteger("TreatTime");
 		}
@@ -165,10 +170,11 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 			this.heal(0.25f);
 		}
 
-		if(!this.world.isRemote&&!this.activeTreat.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
+//		if(!this.world.isRemote&&!this.activeTreat.isEmpty()&&this.activeTreat.getItem() instanceof ItemTreat&&!((ItemTreat)this.activeTreat.getItem()).treatDrop.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
+		if(!this.world.isRemote&&this.activeTreat != null&&!this.activeTreat.treatDrop.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
 			timeTillTreat = this.rand.nextInt(6000) + 6000;
 			timeTillTreat/=this.treatLevel;
-			this.entityDropItem(this.activeTreat, 0.0f);
+			this.entityDropItem(this.activeTreat.treatDrop, 0.0f);
 		}
 	}
 
@@ -187,6 +193,11 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 			
 			becameEvil = true;
 		}
+		
+		if(this.activeTreat!=null) {
+			this.activeTreat.effects.onDeath(this, this.activeTreat, this.treatLevel, source.getTrueSource());
+		}
+		
 		super.onDeath(source);
 	}
 
@@ -220,7 +231,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 				} else if(itemstack.getItem() instanceof ItemTreat) {
 					ItemTreat item = (ItemTreat) itemstack.getItem();
 
-					if(this.activeTreat.isItemEqual(item.treatDrop)) {
+					if(this.activeTreat==item) {
 						if(this.treatLevel<2 ) {
 							this.treatLevel++;
 							this.timeTillTreat/=this.treatLevel;
@@ -230,7 +241,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 							}
 						}
 					} else {
-						this.activeTreat=item.treatDrop.copy();
+						this.activeTreat=item;//itemstack.copy();//item.treatDrop.copy();
 						this.treatLevel=1;
 
 						if (!player.capabilities.isCreativeMode)
