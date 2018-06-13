@@ -1,0 +1,23 @@
+{ 
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "TTT",
+    "TtT",
+    "TTT"  ],
+  "key": {
+    "T": [
+      {
+        "item": "minecraft:tnt"
+      }
+    ],
+    "t": [
+      {
+        "type": "forge:ore_dict",
+        "ore": "treat"
+      }
+    ]
+  },
+  "result": {
+    "item": "sheadpets:treat_bomb"
+  }
+}

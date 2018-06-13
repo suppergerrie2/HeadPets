@@ -1,0 +1,29 @@
+{ 
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "PWP",
+    "WTW",
+    "PWP"  ],
+  "key": {
+    "P": [
+      {
+        "item": "minecraft:potion",
+        "data": 32767
+      }
+    ],    
+    "W": [
+      {
+        "item": "minecraft:nether_wart"
+      }
+    ],
+    "T": [
+      {
+        "type": "forge:ore_dict",
+        "ore": "treat"
+      }
+    ]
+  },
+  "result": {
+    "item": "sheadpets:treat_potion"
+  }
+}

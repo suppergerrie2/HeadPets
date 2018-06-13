@@ -1,0 +1,23 @@
+{ 
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "SSS",
+    "STS",
+    "SSS"  ],
+  "key": {
+    "S": [
+      {
+        "item": "sheadpets:spawn_pet"
+      }
+    ],
+    "T": [
+      {
+        "type": "forge:ore_dict",
+        "ore": "treat"
+      }
+    ]
+  },
+  "result": {
+    "item": "sheadpets:treat_skull_swarm"
+  }
+}

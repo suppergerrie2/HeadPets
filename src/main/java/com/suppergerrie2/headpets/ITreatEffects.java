@@ -11,4 +11,7 @@ public interface ITreatEffects {
 
 	void onDeath(EntityHeadPet head, ItemTreat item, int level, @Nullable Entity killer);
 	
+	default boolean hasDeathEffect() {
+		return false;
+	}
 }

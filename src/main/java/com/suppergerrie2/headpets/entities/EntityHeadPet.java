@@ -117,10 +117,6 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 			compound.setInteger("TreatTime", this.timeTillTreat);
 		}
 		
-		//DEBUG REMOVE THIS BEFORE RELEASE!
-		HeadPets.logger.fatal("WHY IS THIS STILL HERE?");
-		this.timeTillTreat = 0;
-
 	}
 
 	public void readEntityFromNBT(NBTTagCompound compound)
@@ -170,7 +166,6 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 			this.heal(0.25f);
 		}
 
-//		if(!this.world.isRemote&&!this.activeTreat.isEmpty()&&this.activeTreat.getItem() instanceof ItemTreat&&!((ItemTreat)this.activeTreat.getItem()).treatDrop.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
 		if(!this.world.isRemote&&this.activeTreat != null&&!this.activeTreat.treatDrop.isEmpty()&&--timeTillTreat<0&&this.treatLevel>0) {
 			timeTillTreat = this.rand.nextInt(6000) + 6000;
 			timeTillTreat/=this.treatLevel;
@@ -181,12 +176,8 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 	@Override
 	public void onDeath(DamageSource source) {
 		if(this.world.getDifficulty()!=EnumDifficulty.PEACEFUL&&this.world.rand.nextInt(8)<=2&&!this.world.isRemote&&this.getOwnerId()!=null) {
-			EnumType newType = this.type;
-			if(!newType.isEvil()) {
-				newType = EnumType.getRandomEvilType(this.world.rand);
-			}
 			
-			Entity toSpawn = new EntityHeadEvil(this.world, newType);
+			Entity toSpawn = new EntityHeadEvil(this.world, this);
 			toSpawn.setPosition(this.posX, this.posY, this.posZ);
 	
 			this.world.spawnEntity(toSpawn);

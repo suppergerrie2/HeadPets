@@ -1,0 +1,22 @@
+{ 
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TTT",
+    "TsT",
+    "TTT"  ],
+  "key": {
+    "T": [
+      {
+        "item": "sheadpets:treat_bomb"
+      }
+    ],
+    "s": [
+      {
+        "item": "minecraft:nether_star"
+      }
+    ]
+  },
+  "result": {
+    "item": "sheadpets:treat_super_bomb"
+  }
+}

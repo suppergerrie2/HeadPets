@@ -158,9 +158,6 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 			this.mode = nbtTagCompound.getBoolean("Mode");
 		}
 
-		//		if(nbtTagCompound.hasKey("TotalCraftTime")) {
-		//			        	this.totalCraftTime = nbtTagCompound.getInteger("TotalCraftTime");
-		//		}
 	}
 
 	@Override
@@ -171,7 +168,6 @@ public class TileEntityHeadCrafter extends TileEntity implements ITickable {
 		nbtTagCompound.setString("TextureString", this.textureString);
 		nbtTagCompound.setInteger("CraftTime", this.currentCraftTime);
 		nbtTagCompound.setBoolean("Mode", this.mode);
-		//		nbtTagCompound.setInteger("TotalCraftTime", this.totalCraftTime);
 
 		return nbtTagCompound;
 	}

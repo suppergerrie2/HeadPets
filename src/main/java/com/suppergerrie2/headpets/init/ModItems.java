@@ -37,6 +37,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.oredict.OreDictionary;
 
 @EventBusSubscriber(modid=Reference.MODID)
 public class ModItems {
@@ -60,11 +61,29 @@ public class ModItems {
 
 				@Override
 				public int compare(ItemStack o1, ItemStack o2) {
-
+					
+					//Check if both items are itemTreat items.
 					if(o1.getItem() instanceof ItemTreat && o2.getItem() instanceof ItemTreat) {
+						//Check if they have death effects
+						if(((ItemTreat)o1.getItem()).effects.hasDeathEffect()) {
+							//If they both have death effects, sort on name
+							if(((ItemTreat)o2.getItem()).effects.hasDeathEffect()) {
+								return o1.getDisplayName().compareTo(o2.getDisplayName());
+							} else {
+								//Else make sure o1 gets behind o2
+								return 1;
+							}
+						
+						//If o2 has the death effect but o1 not make sure it gets behind o1
+						} else if(((ItemTreat)o2.getItem()).effects.hasDeathEffect()) {
+							return -1;
+						}
+						
+						//Else sort on name
 						return o1.getDisplayName().compareTo(o2.getDisplayName());
 					}
-
+					
+					//Determine which of the items is the ItemTreat and return the correct int
 					if(o1.getItem() instanceof ItemTreat) {
 						return 1;
 					} else if (o2.getItem() instanceof ItemTreat) {
@@ -167,9 +186,7 @@ public class ModItems {
 			public void onDeath(EntityHeadPet head, ItemTreat item, int level, Entity killer) {
 				int amount = head.world.rand.nextInt(level)+6;
 				for(int i = 0; i < amount; i++) {
-					EntityHeadEvil evil = new EntityHeadEvil(head.world, head.getType());
-
-					evil.setPosition(head.posX, head.posY, head.posZ);
+					EntityHeadEvil evil = new EntityHeadEvil(head.world, head);
 
 					double totalVel = 0.25;
 					double arc = ((Math.PI*2)/amount)*i;
@@ -182,6 +199,10 @@ public class ModItems {
 					head.world.spawnEntity(evil);
 				}
 			}
+			
+			public boolean hasDeathEffect() {
+				return true;
+			}
 
 		}));
 
@@ -191,21 +212,15 @@ public class ModItems {
 			@Override
 			public void onDeath(EntityHeadPet head, ItemTreat item, int level, Entity killer) {
 				head.spawnExplosionParticle();
-				int amount = head.world.rand.nextInt(level+1)+2;
-				for(int i = 0; i < amount; i++) {
 					EntityTNTPrimed tnt = new EntityTNTPrimed(head.world, head.posX, head.posY, head.posZ, head);
-
-					double totalVel = 0.25;
-					double arc = ((Math.PI*2)/amount)*i;
-
-					double xVel = amount==1?0:Math.cos(arc)*totalVel;
-					double zVel = amount==1?0:Math.sin(arc)*totalVel;
-
-					tnt.setVelocity(xVel, 0.5 + head.world.rand.nextFloat()*0.1-0.05, zVel);
-					tnt.setFuse(25);
+					tnt.setVelocity(0, 0, 0);
+					tnt.setFuse(0);
 
 					head.world.spawnEntity(tnt);
-				}
+			}
+			
+			public boolean hasDeathEffect() {
+				return true;
 			}
 
 		}));
@@ -218,9 +233,8 @@ public class ModItems {
 				head.spawnExplosionParticle();
 				int ringAmount = head.world.rand.nextInt(level+1)+2;
 				int startTntAmount = (head.world.rand.nextInt(level)+2)*3;
-				
+
 				for(int ringIndex = 0; ringIndex < ringAmount; ringIndex++) {
-//					int amount = head.world.rand.nextInt(level+1)+2*(10/(ringIndex+1));
 					int amount =  startTntAmount*(ringIndex+1);
 					for(int i = 0; i < amount; i++) {
 						EntityTNTPrimed tnt = new EntityTNTPrimed(head.world, head.posX, head.posY, head.posZ, head);
@@ -237,6 +251,10 @@ public class ModItems {
 						head.world.spawnEntity(tnt);
 					}
 				}
+			}
+			
+			public boolean hasDeathEffect() {
+				return true;
 			}
 
 		}));
@@ -263,6 +281,10 @@ public class ModItems {
 
 					head.world.spawnEntity(rabbit);
 				}
+			}
+			
+			public boolean hasDeathEffect() {
+				return true;
 			}
 
 		}));
@@ -301,11 +323,19 @@ public class ModItems {
 					head.world.spawnEntity(potionEntity);
 				}
 			}
+			
+			public boolean hasDeathEffect() {
+				return true;
+			}
 
 		}));
 
 		event.getRegistry().registerAll(spawnPet, craftWand);
 		event.getRegistry().registerAll(treats.toArray(new ItemTreat[0]));
+
+		for(Item item : treats) { 
+			OreDictionary.registerOre("treat", item);
+		}
 	}
 
 	@SubscribeEvent

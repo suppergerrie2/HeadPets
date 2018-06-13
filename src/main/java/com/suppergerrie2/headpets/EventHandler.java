@@ -38,7 +38,6 @@ public class EventHandler {
 		ImmutableList<Mapping<EntityEntry>> mappings = e.getMappings();
 		for(Mapping<EntityEntry> mapping : mappings) {
 			if(mapping.key.equals(new ResourceLocation(Reference.MODID, "pet"))) {
-				System.out.println(mapping.key);
 				mapping.remap(headPet);
 			}
 		}

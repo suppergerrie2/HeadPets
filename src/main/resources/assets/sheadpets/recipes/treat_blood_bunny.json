@@ -1,0 +1,28 @@
+{ 
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "HMH",
+    "MTM",
+    "HMH"  ],
+  "key": {
+    "H": [
+      {
+        "item": "minecraft:rabbit_hide"
+      }
+    ],    
+    "M": [
+      {
+        "item": "minecraft:rabbit"
+      }
+    ],
+    "T": [
+      {
+        "type": "forge:ore_dict",
+        "ore": "treat"
+      }
+    ]
+  },
+  "result": {
+    "item": "sheadpets:treat_blood_bunny"
+  }
+}

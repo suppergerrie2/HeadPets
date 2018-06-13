@@ -1,5 +1,9 @@
 package com.suppergerrie2.headpets.entities;
 
+import com.google.common.collect.Iterables;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -23,6 +27,26 @@ public class EntityHeadEvil extends EntityHead {
 
 	public EntityHeadEvil(World worldIn, EnumType type) {
 		super(worldIn, type);
+	}
+
+	public EntityHeadEvil(World worldIn, EntityHeadPet pet) {
+		super(worldIn, pet.getType());
+
+		this.setPosition(pet.posX, pet.posY, pet.posZ);
+		
+		if(pet.getType()==EnumType.CHAR) {
+			GameProfile profile = pet.getTextureProfile();
+
+			if(profile!=null) {
+				String text = "";
+				if(profile.getProperties().containsKey("textures")) {
+					Property property = (Property)Iterables.getFirst(profile.getProperties().get("textures"), (Object)null);
+					text = property.getValue();
+				}
+
+				this.setTexture(text, profile.getName());
+			}
+		}
 	}
 
 	@Override
@@ -55,12 +79,12 @@ public class EntityHeadEvil extends EntityHead {
 
 		return flag;
 	}
-	
+
 	@Override
 	public void spawnRunningParticles()
-    {
+	{
 		super.spawnRunningParticles();
-		
+
 		if(this.rand.nextInt(16)==0) {
 			this.world.spawnParticle(EnumParticleTypes.BLOCK_DUST,
 					this.posX + ((double)this.rand.nextFloat() - 0.5D) * (double)this.width,
@@ -71,7 +95,7 @@ public class EntityHeadEvil extends EntityHead {
 					(this.rand.nextFloat()-0.5f)*0.25f,
 					Block.getStateId(Blocks.REDSTONE_BLOCK.getDefaultState()));
 		}
-    }
+	}
 
 	@Override
 	protected boolean canDespawn() {

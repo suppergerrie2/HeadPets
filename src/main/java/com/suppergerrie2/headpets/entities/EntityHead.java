@@ -1,7 +1,5 @@
 package com.suppergerrie2.headpets.entities;
 
-import java.util.Random;
-
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.suppergerrie2.headpets.HeadPets;
@@ -194,10 +192,6 @@ public abstract class EntityHead extends EntityTameable implements IEntityAdditi
 			return name;
 		}
 
-		public boolean isEvil() {
-			return this==SKELETON||this==WITHER||this==ZOMBIE||this==CREEPER;
-		}
-
 		private EnumType(String name, int meta) {
 			this.name = name;
 			this.metadata = meta;
@@ -208,14 +202,7 @@ public abstract class EntityHead extends EntityTameable implements IEntityAdditi
 
 			return EnumType.valueOf(SKULL_TYPES[metadata].toUpperCase());
 		}
-
-		public static EnumType getRandomEvilType(Random rand) {
-			int meta = rand.nextInt(4);
-			if(meta==3) meta = 4;
-			
-			return EnumType.fromMetadata(meta);
-		}
-
+		
 		public static EnumType getTypeForEntity(Entity entity) {
 			EnumType type;
 			
