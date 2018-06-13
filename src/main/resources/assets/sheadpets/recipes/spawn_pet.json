@@ -1,0 +1,43 @@
+{ 
+  "type": "sheadpets:copy_skull_profile",
+  "pattern": [
+    "SGS",
+    "MsR",
+    "SES"  ],
+  "key": {
+    "S": [
+      {
+        "item": "minecraft:nether_star"
+      }
+    ],
+    "G": [
+      {
+        "item": "minecraft:ghast_tear"
+      }
+    ],
+    "M": [
+      {
+        "item": "minecraft:milk_bucket"
+      }
+    ],
+    "R": [
+      {
+        "item": "minecraft:rotten_flesh"
+      }
+    ],
+    "E": [
+      {
+        "item": "minecraft:end_crystal"
+      }
+    ],
+    "s": [
+      {
+        "item": "minecraft:skull",
+        "data": 32767
+      }
+    ]
+  },
+  "result": {
+    "item": "sheadpets:spawn_pet"
+  }
+}

@@ -12,7 +12,7 @@ import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.items.ItemCraftWand;
 import com.suppergerrie2.headpets.items.ItemSpawnPet;
 import com.suppergerrie2.headpets.items.ItemTreat;
-import com.suppergerrie2.headpets.items.crafting.RecipeHeadPet;
+import com.suppergerrie2.headpets.items.crafting.SkullProfileCopierRecipe;
 
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockStone;
@@ -353,7 +353,7 @@ public class ModItems {
 
 	@SubscribeEvent
 	public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		IRecipe recipeHeadPet = new RecipeHeadPet().setRegistryName("head_pet_recipe");
-		event.getRegistry().register(recipeHeadPet);
+//		IRecipe recipeHeadPet = new SkullProfileCopierRecipe().setRegistryName("head_pet_recipe");
+//		event.getRegistry().register(recipeHeadPet);
 	}
 }
