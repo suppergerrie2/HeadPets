@@ -25,6 +25,7 @@ import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,6 +35,8 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
@@ -44,13 +47,13 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 
 	EntityAISit aiSit;
 	boolean sitting = false;
-	
-//	ItemStack activeTreat = ItemStack.EMPTY;
+
+	//	ItemStack activeTreat = ItemStack.EMPTY;
 	ItemTreat activeTreat = null;
 	int treatLevel = 0;
 
 	int timeTillTreat;
-	
+
 	boolean becameEvil = false;
 
 	public EntityHeadPet(World worldIn) {
@@ -83,7 +86,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
 		this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
 	}
-	
+
 	protected void applyEntityAttributes()
 	{
 		super.applyEntityAttributes();
@@ -116,7 +119,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 			compound.setInteger("TreatLevel", this.treatLevel);
 			compound.setInteger("TreatTime", this.timeTillTreat);
 		}
-		
+
 	}
 
 	public void readEntityFromNBT(NBTTagCompound compound)
@@ -152,9 +155,14 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		}
 
 		if(compound.hasKey("ActiveTreat")) {
-			this.activeTreat = (ItemTreat) new ItemStack((NBTTagCompound) compound.getTag("ActiveTreat")).getItem();
-			this.treatLevel = compound.getInteger("TreatLevel");
-			this.timeTillTreat = compound.getInteger("TreatTime");
+			Item i = new ItemStack((NBTTagCompound) compound.getTag("ActiveTreat")).getItem();
+			if(i instanceof ItemTreat) {
+				this.activeTreat = (ItemTreat) i;
+				this.treatLevel = compound.getInteger("TreatLevel");
+				this.timeTillTreat = compound.getInteger("TreatTime");
+			} else {
+				HeadPets.logger.warn("Treat in entity is not a valid treat item. Probably updated from an old version.");
+			}
 		}
 	}
 
@@ -176,19 +184,19 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 	@Override
 	public void onDeath(DamageSource source) {
 		if(this.world.getDifficulty()!=EnumDifficulty.PEACEFUL&&this.world.rand.nextInt(8)<=2&&!this.world.isRemote&&this.getOwnerId()!=null) {
-			
+
 			Entity toSpawn = new EntityHeadEvil(this.world, this);
 			toSpawn.setPosition(this.posX, this.posY, this.posZ);
-	
+
 			this.world.spawnEntity(toSpawn);
-			
+
 			becameEvil = true;
 		}
-		
+
 		if(this.activeTreat!=null) {
 			this.activeTreat.effects.onDeath(this, this.activeTreat, this.treatLevel, source.getTrueSource());
 		}
-		
+
 		super.onDeath(source);
 	}
 
@@ -267,7 +275,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		}
 		return super.attackEntityFrom(source, amount);
 	}
-	
+
 	@Override
 	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
 	{
@@ -281,7 +289,7 @@ public class EntityHeadPet extends EntityHead implements IEntityOwnable, IEntity
 		if(entitylivingbaseIn instanceof EntityCreeper) {
 			return;
 		}
-	
+
 		super.setAttackTarget(entitylivingbaseIn);
 	}
 

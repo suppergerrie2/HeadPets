@@ -76,77 +76,80 @@ public class EventHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public void drawSelectionBox(DrawBlockHighlightEvent e) {
-		BlockPos blockpos = e.getTarget().getBlockPos();
-		if(blockpos!=null) {
-			IBlockState iblockstate = e.getPlayer().world.getBlockState(blockpos);
+	public static class EventHandlerClient {
 
-			if(iblockstate.getBlock()==ModBlocks.headCrafter) {
-				GlStateManager.enableBlend();
-				GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-				GlStateManager.glLineWidth(2.0F);
-				GlStateManager.disableTexture2D();
-				GlStateManager.depthMask(false);
+		@SubscribeEvent
+		public void drawSelectionBox(DrawBlockHighlightEvent e) {
+			BlockPos blockpos = e.getTarget().getBlockPos();
+			if(blockpos!=null) {
+				IBlockState iblockstate = e.getPlayer().world.getBlockState(blockpos);
 
-				EntityPlayer player = e.getPlayer();
-				float partialTicks = e.getPartialTicks();
-				if (iblockstate.getMaterial() != Material.AIR && player.world.getWorldBorder().contains(blockpos))
-				{
-					double d3 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
-					double d4 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
-					double d5 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
+				if(iblockstate.getBlock()==ModBlocks.headCrafter) {
+					GlStateManager.enableBlend();
+					GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+					GlStateManager.glLineWidth(2.0F);
+					GlStateManager.disableTexture2D();
+					GlStateManager.depthMask(false);
 
-					AxisAlignedBB bottomPart = new AxisAlignedBB(0,0,0,1,0.5,1);
-					AxisAlignedBB topPart = new AxisAlignedBB(.25, 0.5, 0.25, 0.75, 1, 0.75);
+					EntityPlayer player = e.getPlayer();
+					float partialTicks = e.getPartialTicks();
+					if (iblockstate.getMaterial() != Material.AIR && player.world.getWorldBorder().contains(blockpos))
+					{
+						double d3 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
+						double d4 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
+						double d5 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
 
-					drawSelectionBoundingBox(bottomPart.grow(0.0020000000949949026D).offset(blockpos).offset(-d3, -d4, -d5), 0.0F, 0.0F, 0.0F, 0.4F);
-					drawSelectionBoundingBox(topPart.grow(0.0020000000949949026D).offset(blockpos).offset(-d3, -d4, -d5), 0.0F, 0.0F, 0.0F, 0.4F);
+						AxisAlignedBB bottomPart = new AxisAlignedBB(0,0,0,1,0.5,1);
+						AxisAlignedBB topPart = new AxisAlignedBB(.25, 0.5, 0.25, 0.75, 1, 0.75);
+
+						drawSelectionBoundingBox(bottomPart.grow(0.0020000000949949026D).offset(blockpos).offset(-d3, -d4, -d5), 0.0F, 0.0F, 0.0F, 0.4F);
+						drawSelectionBoundingBox(topPart.grow(0.0020000000949949026D).offset(blockpos).offset(-d3, -d4, -d5), 0.0F, 0.0F, 0.0F, 0.4F);
+					}
+
+					GlStateManager.depthMask(true);
+					GlStateManager.enableTexture2D();
+					GlStateManager.disableBlend();
+					e.setCanceled(true);
 				}
-
-				GlStateManager.depthMask(true);
-				GlStateManager.enableTexture2D();
-				GlStateManager.disableBlend();
-				e.setCanceled(true);
 			}
+
 		}
 
-	}
+		public static void drawSelectionBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha)
+		{
+			drawBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, red, green, blue, alpha);
+		}
 
-	public static void drawSelectionBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha)
-	{
-		drawBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, red, green, blue, alpha);
-	}
+		public static void drawBoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
+		{
+			Tessellator tessellator = Tessellator.getInstance();
+			BufferBuilder bufferbuilder = tessellator.getBuffer();
+			bufferbuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
+			drawBoundingBox(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
+			tessellator.draw();
+		}
 
-	public static void drawBoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		bufferbuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
-		drawBoundingBox(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
-		tessellator.draw();
-	}
-
-	public static void drawBoundingBox(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
-	{
-		buffer.pos(minX, minY, minZ).color(red, green, blue, 0.0F).endVertex();
-		buffer.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(minX, maxY, maxZ).color(red, green, blue, 0.0F).endVertex();
-		buffer.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, maxY, maxZ).color(red, green, blue, 0.0F).endVertex();
-		buffer.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, maxY, minZ).color(red, green, blue, 0.0F).endVertex();
-		buffer.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(maxX, minY, minZ).color(red, green, blue, 0.0F).endVertex();
+		public static void drawBoundingBox(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
+		{
+			buffer.pos(minX, minY, minZ).color(red, green, blue, 0.0F).endVertex();
+			buffer.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(minX, maxY, maxZ).color(red, green, blue, 0.0F).endVertex();
+			buffer.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, maxY, maxZ).color(red, green, blue, 0.0F).endVertex();
+			buffer.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, maxY, minZ).color(red, green, blue, 0.0F).endVertex();
+			buffer.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+			buffer.pos(maxX, minY, minZ).color(red, green, blue, 0.0F).endVertex();
+		}
 	}
 }
 

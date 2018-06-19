@@ -1,11 +1,13 @@
 package com.suppergerrie2.headpets.proxies;
 
+import com.suppergerrie2.headpets.EventHandler;
 import com.suppergerrie2.headpets.entities.EntityHeadEvil;
 import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.entities.rendering.RenderEntityHead;
 
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -31,6 +33,8 @@ public class ClientProxy implements IProxy {
 				return new RenderEntityHead(manager);
 			}
 		});
+		
+		MinecraftForge.EVENT_BUS.register(new EventHandler.EventHandlerClient());
 	}
 
 	@Override

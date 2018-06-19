@@ -194,8 +194,11 @@ public class ModItems {
 					double xVel = amount==1?0:Math.cos(arc)*totalVel;
 					double zVel = amount==1?0:Math.sin(arc)*totalVel;
 
-					evil.setVelocity(xVel, 0.5 + head.world.rand.nextFloat()*0.1-0.05, zVel);
-
+//					evil.setVelocity(xVel, 0.5 + head.world.rand.nextFloat()*0.1-0.05, zVel);
+					evil.motionX = xVel;
+					evil.motionY = 0.5 + head.world.rand.nextFloat()*0.1-0.05;
+					evil.motionZ = zVel;
+					
 					head.world.spawnEntity(evil);
 				}
 			}
@@ -213,7 +216,10 @@ public class ModItems {
 			public void onDeath(EntityHeadPet head, ItemTreat item, int level, Entity killer) {
 				head.spawnExplosionParticle();
 					EntityTNTPrimed tnt = new EntityTNTPrimed(head.world, head.posX, head.posY, head.posZ, head);
-					tnt.setVelocity(0, 0, 0);
+//					tnt.setVelocity(0, 0, 0);
+					tnt.motionX = 0;
+					tnt.motionY = 0;
+					tnt.motionZ = 0;
 					tnt.setFuse(0);
 
 					head.world.spawnEntity(tnt);
@@ -245,7 +251,10 @@ public class ModItems {
 						double xVel = amount==1?0:Math.cos(arc)*totalVel;
 						double zVel = amount==1?0:Math.sin(arc)*totalVel;
 
-						tnt.setVelocity(xVel, 0.6 + head.world.rand.nextFloat()*0.1-0.05, zVel);
+//						tnt.setVelocity(xVel, 0.6 + head.world.rand.nextFloat()*0.1-0.05, zVel);
+						tnt.motionX = xVel;
+						tnt.motionY = 0.6 + head.world.rand.nextFloat()*0.1-0.05;
+						tnt.motionZ = zVel;
 						tnt.setFuse(30);
 
 						head.world.spawnEntity(tnt);
@@ -277,8 +286,11 @@ public class ModItems {
 					double xVel = amount==1?0:Math.cos(arc)*totalVel;
 					double zVel = amount==1?0:Math.sin(arc)*totalVel;
 
-					rabbit.setVelocity(xVel, 0.5 + head.world.rand.nextFloat()*0.1-0.05, zVel);
-
+//					rabbit.setVelocity(xVel, 0.5 + head.world.rand.nextFloat()*0.1-0.05, zVel);
+					rabbit.motionX = xVel;
+					rabbit.motionY = 0.5 + head.world.rand.nextFloat()*0.1-0.05;
+					rabbit.motionZ = zVel;
+					
 					head.world.spawnEntity(rabbit);
 				}
 			}
@@ -356,4 +368,5 @@ public class ModItems {
 //		IRecipe recipeHeadPet = new SkullProfileCopierRecipe().setRegistryName("head_pet_recipe");
 //		event.getRegistry().register(recipeHeadPet);
 	}
+	
 }
