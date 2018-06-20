@@ -29,6 +29,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
+import java.util.Random;
+
 public abstract class EntityHead extends EntityTameable implements IEntityAdditionalSpawnData {
 
 	protected static final DataParameter<String> TEXTURE = EntityDataManager.<String>createKey(EntityHeadPet.class, DataSerializers.STRING);
@@ -187,7 +189,11 @@ public abstract class EntityHead extends EntityTameable implements IEntityAdditi
 		public final int metadata;
 		private static final String[] SKULL_TYPES = new String[] {"skeleton", "wither", "zombie", "char", "creeper", "dragon"};
 
-		@Override
+        public static EnumType randomType(Random rand) {
+        	return EnumType.fromMetadata(rand.nextInt(6));
+        }
+
+        @Override
 		public String getName() {
 			return name;
 		}

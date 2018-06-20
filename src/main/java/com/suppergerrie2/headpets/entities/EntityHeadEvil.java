@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 public class EntityHeadEvil extends EntityHead {
 
 	public EntityHeadEvil(World worldIn) {
-		this(worldIn, EnumType.SKELETON);
+		this(worldIn, EnumType.randomType(worldIn.rand));
 	}
 
 	public EntityHeadEvil(World worldIn, EnumType type) {
