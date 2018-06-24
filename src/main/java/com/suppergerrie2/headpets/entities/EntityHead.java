@@ -39,7 +39,8 @@ public abstract class EntityHead extends EntityTameable implements IEntityAdditi
 	GameProfile gameprofile;
 
 	protected EnumType type;
-	
+
+	@SuppressWarnings("unused")
 	public EntityHead(World worldIn) {
 		this(worldIn, EnumType.SKELETON);
 	}

@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 
 public class EntityHeadEvil extends EntityHead {
 
+	@SuppressWarnings("unused")
 	public EntityHeadEvil(World worldIn) {
 		this(worldIn, EnumType.randomType(worldIn.rand));
 	}

@@ -35,10 +35,19 @@ public class ItemSpawnPet extends Item {
 			ItemStack itemstack = player.getHeldItem(hand);
 			
 			EnumType type = EnumType.SKELETON;
+			ItemTreat treat = null;
+
 			if(itemstack.hasTagCompound()) {
-				type = EnumType.valueOf(itemstack.getTagCompound().getString("Type").toUpperCase());
+				if(itemstack.getTagCompound().hasKey("Type")) {
+					type = EnumType.valueOf(itemstack.getTagCompound().getString("Type").toUpperCase());
+				}
+				if(itemstack.getTagCompound().hasKey("treat")) {
+				    treat = (ItemTreat) Item.getByNameOrId(itemstack.getTagCompound().getString("treat"));
+                }
 			}
 			EntityHeadPet pet = new EntityHeadPet(worldIn, player.getGameProfile().getId(), type);
+
+			pet.setTreat(treat);
 			
 			if(type==EnumType.CHAR) {
 				GameProfile profile = null;
@@ -52,12 +61,6 @@ public class ItemSpawnPet extends Item {
 				} 
 				
 				if(profile!=null){
-		//			PlayerProfileCache profileCache = worldIn.getMinecraftServer().getPlayerProfileCache();
-		//			profile = profileCache.getGameProfileForUsername("Dinnerbone");
-					
-		//			MinecraftSessionService sessionService = worldIn.getMinecraftServer().getMinecraftSessionService();
-		//			profile = sessionService.fillProfileProperties(profile, false);
-					
 					String text = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdlMjI4YjllOTVjOTg2NzIxMTU1NWFjYjE1N2IwYmFhODJiZjhhY2E0MThmY2UwNjFlN2YyZjQyMWNlOGJkZSJ9fX0=";
 					if(profile.getProperties().containsKey("textures")) {
 						 Property property = (Property)Iterables.getFirst(profile.getProperties().get("textures"), (Object)null);

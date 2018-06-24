@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;;
 
+@SuppressWarnings("unused")
 public class EventHandler {
 
 	EntityEntry headPet;
@@ -115,12 +116,12 @@ public class EventHandler {
 
 		}
 
-		public static void drawSelectionBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha)
+		static void drawSelectionBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha)
 		{
 			drawBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, red, green, blue, alpha);
 		}
 
-		public static void drawBoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
+		static void drawBoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
 		{
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -129,7 +130,7 @@ public class EventHandler {
 			tessellator.draw();
 		}
 
-		public static void drawBoundingBox(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
+		static void drawBoundingBox(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha)
 		{
 			buffer.pos(minX, minY, minZ).color(red, green, blue, 0.0F).endVertex();
 			buffer.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();

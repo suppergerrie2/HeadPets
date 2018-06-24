@@ -1,5 +1,6 @@
 {
   "recipes": {
-    "copy_skull_profile": "com.suppergerrie2.headpets.items.crafting.SkullProfileCopierRecipeFactory"
+    "copy_skull_profile": "com.suppergerrie2.headpets.items.crafting.SkullProfileCopierRecipeFactory",
+    "combine_treat_spawner": "com.suppergerrie2.headpets.items.crafting.SpawnerTreatCombineRecipeFactory"
   }
 }

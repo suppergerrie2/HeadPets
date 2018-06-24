@@ -1,0 +1,15 @@
+{
+  "type": "sheadpets:combine_treat_spawner",
+  "ingredients": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "treat"
+    },
+    {
+      "item": "sheadpets:spawn_pet"
+    }
+  ],
+  "result": {
+    "item": "sheadpets:spawn_pet"
+  }
+}
