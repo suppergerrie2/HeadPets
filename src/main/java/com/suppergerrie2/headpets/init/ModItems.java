@@ -7,9 +7,11 @@ import java.util.List;
 
 import com.suppergerrie2.headpets.ITreatEffects;
 import com.suppergerrie2.headpets.Reference;
+import com.suppergerrie2.headpets.entities.EntityHead;
 import com.suppergerrie2.headpets.entities.EntityHeadEvil;
 import com.suppergerrie2.headpets.entities.EntityHeadPet;
 import com.suppergerrie2.headpets.items.ItemCraftWand;
+import com.suppergerrie2.headpets.items.ItemSpawnEvilHead;
 import com.suppergerrie2.headpets.items.ItemSpawnPet;
 import com.suppergerrie2.headpets.items.ItemTreat;
 import com.suppergerrie2.headpets.items.crafting.SkullProfileCopierRecipe;
@@ -171,13 +173,6 @@ public class ModItems {
 		for(ItemStack stack : treatTypes) {
 			treats.add(new ItemTreat(stack));
 		}
-
-		/**
-		 * skull swarm is literally a swarm of 6 evil copies of the killed head
-		 * bomb is an explosion
-		 * bloodlust bunny summons  6 killer bunnies with a basic strength buff
-		 * skull potion is all negative affects for 2 minutes. all level 1 is good
-		 */
 
 		//Skull swarm
 		treats.add(new ItemTreat("treat_skull_swarm", new ITreatEffects() {
@@ -345,6 +340,8 @@ public class ModItems {
 		event.getRegistry().registerAll(spawnPet, craftWand);
 		event.getRegistry().registerAll(treats.toArray(new ItemTreat[0]));
 
+        event.getRegistry().register(new ItemSpawnEvilHead());
+
 		for(Item item : treats) { 
 			OreDictionary.registerOre("treat", item);
 		}
@@ -365,8 +362,6 @@ public class ModItems {
 
 	@SubscribeEvent
 	public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-//		IRecipe recipeHeadPet = new SkullProfileCopierRecipe().setRegistryName("head_pet_recipe");
-//		event.getRegistry().register(recipeHeadPet);
 	}
 	
 }

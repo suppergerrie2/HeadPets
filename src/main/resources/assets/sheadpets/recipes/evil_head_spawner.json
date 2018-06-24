@@ -1,0 +1,15 @@
+{
+  "type": "sheadpets:clone_spawner_nbt",
+  "group": "evil_spawner",
+  "ingredients": [
+    {
+      "item": "minecraft:nether_star"
+    },
+    {
+      "item": "sheadpets:spawn_pet"
+    }
+  ],
+  "result": {
+    "item": "sheadpets:spawn_evil_head"
+  }
+}

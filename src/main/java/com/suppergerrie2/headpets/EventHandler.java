@@ -47,7 +47,7 @@ public class EventHandler {
 	@SubscribeEvent
 	public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
 		headPet = EntityEntryBuilder.create().entity(EntityHeadPet.class).name("head_pet").tracker(80, 1, false).id(new ResourceLocation(Reference.MODID, "head_pet"), 0).build();
-		headEvil = EntityEntryBuilder.create().entity(EntityHeadEvil.class).name("head_evil").tracker(80, 1, false).id(new ResourceLocation(Reference.MODID, "head_evil"), 1).egg(3555205,15404558).build();
+		headEvil = EntityEntryBuilder.create().entity(EntityHeadEvil.class).name("head_evil").tracker(80, 1, false).id(new ResourceLocation(Reference.MODID, "head_evil"), 1).build();
 		event.getRegistry().registerAll(headPet, headEvil);
 	}
 
