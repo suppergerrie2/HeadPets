@@ -20,6 +20,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.lwjgl.Sys;
 
 import javax.annotation.Nullable;
 
@@ -34,11 +35,9 @@ public class ItemSpawnEvilHead extends Item {
 
             @Override
             public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
-                System.out.println("CHECKING APPLY !!!!!");
                 if(stack.hasTagCompound()) {
                     if(stack.getTagCompound().hasKey("Type")) {
                         EntityHead.EnumType type = EntityHead.EnumType.valueOf(stack.getTagCompound().getString("Type").toUpperCase());
-
                         return type.metadata;
                     }
                 }

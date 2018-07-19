@@ -103,6 +103,7 @@ public class ModItems {
 	}.setBackgroundImageName("item_search.png");
 
 	public static Item spawnPet;
+    public static Item spawnEvilHead;
 	public static Item craftWand;
 	private static List<ItemTreat> treats = new ArrayList<ItemTreat>();
 
@@ -340,7 +341,9 @@ public class ModItems {
 		event.getRegistry().registerAll(spawnPet, craftWand);
 		event.getRegistry().registerAll(treats.toArray(new ItemTreat[0]));
 
-        event.getRegistry().register(new ItemSpawnEvilHead());
+        spawnEvilHead = new ItemSpawnEvilHead();
+
+        event.getRegistry().register(spawnEvilHead);
 
 		for(Item item : treats) { 
 			OreDictionary.registerOre("treat", item);
@@ -351,6 +354,7 @@ public class ModItems {
 	public static void registerRenders(ModelRegistryEvent event) {
 		registerRender(spawnPet);
 		registerRender(craftWand);
+        registerRender(spawnEvilHead);
 		for(ItemTreat item : treats) {
 			registerRender(item);
 		}

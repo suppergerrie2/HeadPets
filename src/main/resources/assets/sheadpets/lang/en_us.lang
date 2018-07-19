@@ -6,6 +6,7 @@ item.treat_bomb.name=Bomb Treat
 item.treat_super_bomb.name=House Destroyer Treat
 item.treat_blood_bunny.name=Blood Bunny Treat
 item.treat_potion.name=Evil Potion Treat
+item.spawn_evil_head.name=Spawn Evil Head
 
 entity.head_pet.name=Head Pet
 entity.head_evil.name=Evil Head

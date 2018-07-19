@@ -4,11 +4,11 @@
         "layer0": "items/compass_16"
      },
     "overrides": [
-      { "predicate": { "type": 0 }, "model": "item/compass" },
-      { "predicate": { "type": 1 }, "model": "item/compass" },
-      { "predicate": { "type": 2 }, "model": "item/compass" },
-      { "predicate": { "type": 3 }, "model": "item/compass" },
-      { "predicate": { "type": 4 }, "model": "item/compass" },
-      { "predicate": { "type": 5 }, "model": "item/compass" }
+      { "predicate": { "type": 0 }, "model": "sheadpets:item/evil_spawner_skeleton" },
+      { "predicate": { "type": 1 }, "model": "sheadpets:item/evil_spawner_wither" },
+      { "predicate": { "type": 2 }, "model": "sheadpets:item/evil_spawner_zombie" },
+      { "predicate": { "type": 3 }, "model": "sheadpets:item/evil_spawner_char" },
+      { "predicate": { "type": 4 }, "model": "sheadpets:item/evil_spawner_creeper" },
+      { "predicate": { "type": 5 }, "model": "sheadpets:item/evil_spawner_dragon" }
     ]
 }
