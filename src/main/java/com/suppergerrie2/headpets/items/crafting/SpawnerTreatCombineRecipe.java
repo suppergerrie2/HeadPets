@@ -1,15 +1,14 @@
 package com.suppergerrie2.headpets.items.crafting;
 
-import com.suppergerrie2.headpets.entities.EntityHeadPet;
+import com.suppergerrie2.headpets.items.ItemSpawnPet;
 import com.suppergerrie2.headpets.items.ItemTreat;
+
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.crafting.CraftingHelper.ShapedPrimer;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class SpawnerTreatCombineRecipe extends ShapelessOreRecipe {
@@ -23,6 +22,17 @@ public class SpawnerTreatCombineRecipe extends ShapelessOreRecipe {
         ItemStack result = this.output.copy();
         NBTTagCompound tag = new NBTTagCompound();
 
+		for(int x = 0; x <inv.getWidth(); x++) {
+			for (int y = 0; y < inv.getHeight(); y++) {
+				if(inv.getStackInRowAndColumn(x,y).getItem() instanceof ItemSpawnPet) {
+					if(inv.getStackInRowAndColumn(x,y).hasTagCompound()) {
+						tag = inv.getStackInRowAndColumn(x, y).getTagCompound();
+						break;
+					}
+				}
+			}
+		}
+        
         for(int x = 0; x <inv.getWidth(); x++) {
             for (int y = 0; y < inv.getHeight(); y++) {
                 if(inv.getStackInRowAndColumn(x,y).getItem() instanceof ItemTreat) {

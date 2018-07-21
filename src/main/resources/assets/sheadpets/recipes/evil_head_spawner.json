@@ -1,14 +1,28 @@
-{
-  "type": "sheadpets:clone_spawner_nbt",
-  "group": "evil_spawner",
-  "ingredients": [
-    {
-      "item": "minecraft:nether_star"
-    },
-    {
-      "item": "sheadpets:spawn_pet"
-    }
-  ],
+{ 
+  "type": "sheadpets:copy_skull_profile",
+  "group": "spawn_evil_head",
+  "pattern": [
+    "SFS",
+    "FsF",
+    "SFS"  ],
+  "key": {
+    "S": [
+      {
+        "item": "minecraft:soul_sand"
+      }
+    ],
+    "F": [
+      {
+        "item": "minecraft:fermented_spider_eye"
+      }
+    ],
+    "s": [
+      {
+        "item": "minecraft:skull",
+        "data": 32767
+      }
+    ]
+  },
   "result": {
     "item": "sheadpets:spawn_evil_head"
   }
